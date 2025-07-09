@@ -14,7 +14,10 @@ export const buildAuthRouter = () => {
                 email: z.string().email(),
                 password: z.string().min(6)
             }).strict())
-            .mutation(async ({ input }) => {
+            .mutation(async ({ input, ctx }) => {
+                if (ctx.userId) {
+                    throw new Error('Already authenticated');
+                }
                 const existing = await prisma.user.findUnique({ where: { email: input.email } });
                 if (existing) throw new Error('User already exists');
                 const hashed = await bcrypt.hash(input.password, 10);
@@ -29,7 +32,10 @@ export const buildAuthRouter = () => {
                 password: z.string().min(6)
             }))
             .output(z.object({ token: z.string() }).strict())
-            .mutation(async ({ input }) => {
+            .mutation(async ({ input, ctx }) => {
+                if (ctx.userId) {
+                    throw new Error('Already authenticated');
+                }
                 const user = await prisma.user.findUnique({ where: { email: input.email } });
                 if (!user) throw new Error('Invalid credentials');
                 const valid = await bcrypt.compare(input.password, user.passwordHash);
