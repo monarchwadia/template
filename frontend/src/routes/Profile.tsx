@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function Profile() {
   // Placeholder user data
   const user = {

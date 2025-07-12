@@ -3,6 +3,8 @@ import { protectedProcedure, publicProcedure, router } from "../server/trpc";
 import z from 'zod';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { UserService } from '../service/UserService';
+import { provideDependencies } from '../provideDependencies';
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret'; // Use a strong secret in production
@@ -18,12 +20,11 @@ export const buildAuthRouter = () => {
                 if (ctx.userId) {
                     throw new Error('Already authenticated');
                 }
-                const existing = await prisma.user.findUnique({ where: { email: input.email } });
-                if (existing) throw new Error('User already exists');
-                const hashed = await bcrypt.hash(input.password, 10);
-                const user = await prisma.user.create({
-                    data: { email: input.email, passwordHash: hashed }
-                });
+                const { userService } = provideDependencies();
+                const user = await userService.createUser(
+                    input.email,
+                    input.password
+                );
                 return { message: "Registration successful", user: user.email };
             }),
         login: publicProcedure
@@ -36,11 +37,11 @@ export const buildAuthRouter = () => {
                 if (ctx.userId) {
                     throw new Error('Already authenticated');
                 }
-                const user = await prisma.user.findUnique({ where: { email: input.email } });
-                if (!user) throw new Error('Invalid credentials');
-                const valid = await bcrypt.compare(input.password, user.passwordHash);
-                if (!valid) throw new Error('Invalid credentials');
-                const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+                const { userService } = provideDependencies();
+                const token = await userService.authenticateUser(
+                    input.email,
+                    input.password
+                )
                 return { token };
             }),
         getSelf: protectedProcedure

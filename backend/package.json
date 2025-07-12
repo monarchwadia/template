@@ -6,8 +6,9 @@
   "types": "src/exports.d.ts",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsx --watch src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed": "tsx prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
