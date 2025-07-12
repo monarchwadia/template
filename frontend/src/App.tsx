@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { useTrpcClient } from "./trpc/useTrpcClient";
+import { trpcClient } from "./trpc/trpcClient";
 
 export default function App(){
-    const trpcClient = useTrpcClient();
     const [message, setMessage] = useState<string>("");
 
     useEffect(() => {
@@ -13,7 +12,7 @@ export default function App(){
             .catch((error) => {
                 console.error("Error fetching health status:", error);
             });
-    }, [trpcClient])
+    }, [])
 
     return (
         <div className="flex flex-col items-center justify-center h-screen">

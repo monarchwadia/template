@@ -1,14 +1,15 @@
 import { createTRPCClient, httpLink } from '@trpc/client';
 import type { AppRouter } from '@git-reports/backend';
+import { AuthUtils } from '../utils/auth.utils';
 
-export const buildTrpcClient = () => {
+const buildTrpcClient = () => {
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
   const trpc = createTRPCClient<AppRouter>({
     links: [
       httpLink({
         url: apiUrl,
         headers: () => {
-          const token = localStorage.getItem('token');
+          const token = AuthUtils.getToken();
           if (token) {
             return {
               Authorization: `Bearer ${token}`,
@@ -22,3 +23,5 @@ export const buildTrpcClient = () => {
   });
   return trpc;
 }
+
+export const trpcClient = buildTrpcClient();

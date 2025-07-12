@@ -1,10 +1,10 @@
 import React from "react";
-import { useTrpcClient } from "../trpc/useTrpcClient";
+import { trpcClient } from "../trpc/trpcClient";
 import { useQueryClient } from "@tanstack/react-query";
+import { AuthUtils } from "../utils/auth.utils";
 
 export default function Login() {
     const tanstackQueryClient = useQueryClient();
-    const trpcClient = useTrpcClient();
     
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -14,7 +14,7 @@ export default function Login() {
         });
 
         if (result) {
-            localStorage.setItem('token', result.token);
+            AuthUtils.setToken(result.token);
             // invalidate the user profile tanstack query to refresh user data
             tanstackQueryClient.invalidateQueries({ queryKey: ['user-profile'] });
             tanstackQueryClient.refetchQueries({ queryKey: ['user-profile'] });

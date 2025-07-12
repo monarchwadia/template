@@ -1,12 +1,20 @@
+import { useNavigate } from "react-router-dom";
 import { useUserProfile } from "../hooks/useUserProfile";
+import { AuthUtils } from "../utils/auth.utils";
 
 export const UserProfileIndicator = () => {
+    const nav = useNavigate();
         const {
             data: userProfile,
             isLoading,
             isError,
             error
         } = useUserProfile();
+
+    const handleLogout = () => {
+        AuthUtils.clearToken();
+        nav("/");
+    }
 
     if (isLoading) {
         return <button className="btn btn-ghost loading">Loading...</button>;
@@ -18,8 +26,13 @@ export const UserProfileIndicator = () => {
         return <></>;
     }
     return (
-        <button className="btn btn-ghost">
-            {userProfile.email}
-        </button>
+        <div>
+            <button className="btn btn-ghost">
+                {userProfile.email}
+            </button>
+            <button className="btn btn-ghost ml-2" onClick={handleLogout}>
+                Logout
+            </button>
+        </div>
     );
 }
