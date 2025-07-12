@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useUserProfile } from "../hooks/useUserProfile";
+import { invalidateUserProfile, useUserProfile } from "../hooks/useUserProfile";
 import { AuthUtils } from "../utils/auth.utils";
 
 export const UserProfileIndicator = () => {
@@ -13,6 +13,7 @@ export const UserProfileIndicator = () => {
 
     const handleLogout = () => {
         AuthUtils.clearToken();
+        invalidateUserProfile();
         nav("/");
     }
 

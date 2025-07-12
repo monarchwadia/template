@@ -1,10 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import { trpcClient } from '../trpc/trpcClient';
+import { trpcClient } from '../clients/trpcClient';
 import { AuthUtils } from '../utils/auth.utils';
+import { queryClient } from '../clients/reactQueryClient';
+
+const keys = {
+  userProfile: ['user-profile'],
+}
 
 export function useUserProfile() {
   return useQuery({
-    queryKey: ['user-profile'],
+    queryKey: keys.userProfile,
     queryFn: async () => {
       const token = AuthUtils.getToken();
       if (!token) return null;
@@ -14,4 +19,8 @@ export function useUserProfile() {
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+}
+
+export const invalidateUserProfile = () => {
+  queryClient.invalidateQueries({ queryKey: keys.userProfile });
 }

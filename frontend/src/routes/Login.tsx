@@ -1,5 +1,5 @@
 import React from "react";
-import { trpcClient } from "../trpc/trpcClient";
+import { trpcClient } from "../clients/trpcClient";
 import { useQueryClient } from "@tanstack/react-query";
 import { AuthUtils } from "../utils/auth.utils";
 

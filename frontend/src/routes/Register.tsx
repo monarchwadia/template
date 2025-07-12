@@ -1,5 +1,5 @@
 import { GuardMustBeLoggedOut } from "../guards/GuardMustBeLoggedOut";
-import { trpcClient } from "../trpc/trpcClient";
+import { trpcClient } from "../clients/trpcClient";
 
 export default function Register() {
   const handleSubmit = (event: React.FormEvent) => {

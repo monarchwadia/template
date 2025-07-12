@@ -8,7 +8,7 @@ export const GuardMustBeLoggedIn = (props: PropsWithChildren) => {
         return <div>Loading...</div>;
     }
 
-    if (!loggedInState) {
+    if (loggedInState === "logged-out") {
         return <div>Please log in to access this page.</div>;
     }
 

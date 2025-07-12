@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { trpcClient } from "./trpc/trpcClient";
+import { trpcClient } from "./clients/trpcClient";
 
 export default function App(){
     const [message, setMessage] = useState<string>("");
