@@ -6,7 +6,6 @@ export function useUserProfile() {
   return useQuery({
     queryKey: ['user-profile'],
     queryFn: async () => {
-      debugger;
       const token = localStorage.getItem('token');
       if (!token) return null;
       // Set token in trpc client headers if needed

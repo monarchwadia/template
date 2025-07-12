@@ -6,7 +6,17 @@ export const buildTrpcClient = () => {
   const trpc = createTRPCClient<AppRouter>({
     links: [
       httpLink({
-        url: apiUrl
+        url: apiUrl,
+        headers: () => {
+          const token = localStorage.getItem('token');
+          if (token) {
+            return {
+              Authorization: `Bearer ${token}`,
+            }
+          } else {
+            return {};
+          }
+        }
       }),
     ],
   });
