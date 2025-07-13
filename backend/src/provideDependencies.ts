@@ -1,6 +1,7 @@
 import { PrismaClient } from "../prisma/generated/prisma";
 import { Dependencies } from "./provideDependencies.types";
-import { AssetService } from "./service/AssetService";
+import { FileManagementService } from "./service/FileManagementService";
+import { S3Client } from "@aws-sdk/client-s3";
 import { JwtService } from "./service/JwtService";
 import { UserService } from "./service/UserService";
 import { getAppConfig } from "./utils/getAppConfig";
@@ -12,9 +13,16 @@ export const provideDependencies = (): Dependencies => {
     const prisma = new PrismaClient();
     const appConfig = getAppConfig();
     const jwtService = new JwtService(appConfig.jwtSecret);
+    const s3 = new S3Client({
+      region: appConfig.s3Region,
+      credentials: {
+        accessKeyId: appConfig.s3AccessKeyId,
+        secretAccessKey: appConfig.s3SecretAccessKey,
+      },
+    });
     instance = {
       userService: new UserService(prisma, jwtService),
-      assetService: new AssetService(prisma),
+      fileManagementService: new FileManagementService(prisma, s3, appConfig.s3Bucket),
     };
   }
 

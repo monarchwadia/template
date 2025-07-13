@@ -1,8 +1,7 @@
-import { AssetService } from "./service/AssetService";
-import { JwtService } from "./service/JwtService";
+import { FileManagementService } from "./service/FileManagementService";
 import { UserService } from "./service/UserService";
 
 export interface Dependencies {
     userService: UserService;
-    assetService: AssetService;
+    fileManagementService: FileManagementService;
 }
