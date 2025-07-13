@@ -70,18 +70,6 @@ export default function MainLayout() {
           <span className="text-lg font-bold text-primary">Coolproject</span>
           <div />
         </header>
-        {/* Main Content Header */}
-        <header className="hidden md:block bg-base-100/80 backdrop-blur-sm border-b border-base-content/10 p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold text-base-content">Dashboard</h2>
-              <p className="text-base-content/60 mt-1">Welcome to your Coolproject dashboard</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="badge badge-primary badge-outline">v1.0.0</div>
-            </div>
-          </div>
-        </header>
         {/* Main Content Area */}
         <div className="flex-1 p-4 md:p-8 overflow-auto">
           <div className="max-w-7xl mx-auto">
