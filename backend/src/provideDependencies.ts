@@ -1,5 +1,6 @@
 import { PrismaClient } from "../prisma/generated/prisma";
 import { Dependencies } from "./provideDependencies.types";
+import { AssetService } from "./service/AssetService";
 import { JwtService } from "./service/JwtService";
 import { UserService } from "./service/UserService";
 import { getAppConfig } from "./utils/getAppConfig";
@@ -13,6 +14,7 @@ export const provideDependencies = (): Dependencies => {
     const jwtService = new JwtService(appConfig.jwtSecret);
     instance = {
       userService: new UserService(prisma, jwtService),
+      assetService: new AssetService(prisma),
     };
   }
 
