@@ -1,19 +1,24 @@
+
 import { GuardMustBeLoggedIn } from "../guards/GuardMustBeLoggedIn";
+import { useUserProfile } from "../hooks/useUserProfile";
 
 export default function Profile() {
-  // Placeholder user data
-  const user = {
-    username: "johndoe",
-    email: "johndoe@example.com",
-  };
+  const { data: user, isLoading, isError, error } = useUserProfile();
 
   return (
     <GuardMustBeLoggedIn>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "80vh" }}>
-        <h2>Profile</h2>
-        <div style={{ border: "1px solid #ccc", borderRadius: 8, padding: 24, minWidth: 300 }}>
-          <p><strong>Username:</strong> {user.username}</p>
-          <p><strong>Email:</strong> {user.email}</p>
+      <div className="flex flex-col justify-center h-full">
+        <h2 className="text-2xl font-bold mb-6">Profile</h2>
+        <div className="border border-base-300 rounded-lg p-8 min-w-[300px] bg-base-100 shadow">
+          {isLoading && <div className="animate-pulse text-base-content/60">Loading...</div>}
+          {isError && <div className="text-error">{error instanceof Error ? error.message : "Failed to load profile."}</div>}
+          {user && (
+            <>
+              {/* <p><strong>Username:</strong> {user.username}</p> */}
+              <p><strong>Email:</strong> {user.email}</p>
+              {/* Add more fields as needed */}
+            </>
+          )}
         </div>
       </div>
     </GuardMustBeLoggedIn>
