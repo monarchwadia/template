@@ -8,10 +8,10 @@ export default function MainLayout() {
       <aside className="w-64 bg-base-300 shadow-xl border-r border-base-content/10 flex flex-col">
         {/* Header */}
         <div className="p-6 border-b border-base-content/10">
-          <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
+          <Link to="/" className="text-2xl font-bold text-primary flex items-center gap-2 hover:text-primary-focus transition-colors">
             <HiBars3 className="w-6 h-6" />
             Git Reports
-          </h1>
+          </Link>
         </div>
         
         {/* Navigation */}
