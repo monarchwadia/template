@@ -34,3 +34,27 @@ Set `DATABASE_URL` to `postgresql://coolproject-postgres:coolproject-postgres@12
 ```
 PGPASSWORD=coolproject-postgres psql -h 127.0.0.1 -p 6432 -U coolproject-postgres -d coolproject-postgres
 ```
+
+## File Management API
+
+We are using S3-compatible APIs for file management. 
+
+For local development, you can run the minio docker image, then create a bucket
+
+
+### Step 1
+
+```bash
+docker run -p 9000:9000 -p 9001:9001 --name coolproject-minio \
+  -e MINIO_ROOT_USER=coolproject-minio -e MINIO_ROOT_PASSWORD=coolproject-minio \
+  minio/minio server /data --console-address ":9001"
+```
+
+### Step 2
+
+Visit localhost:9000
+
+Log in with coolproject-minio/coolproject-minio
+
+Create a bucket called `coolproject-minio`
+
