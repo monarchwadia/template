@@ -4,7 +4,7 @@ import { HiBars3, HiArrowRightOnRectangle, HiUserPlus, HiUser } from "react-icon
 
 export default function MainLayout() {
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-base-100 to-base-200">
+    <div className="flex h-screen bg-gradient-to-br from-base-100 to-base-200">
       <aside className="w-64 bg-base-300 shadow-xl border-r border-base-content/10 flex flex-col">
         {/* Header */}
         <div className="p-6 border-b border-base-content/10">
