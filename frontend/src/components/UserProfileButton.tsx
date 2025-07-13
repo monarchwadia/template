@@ -59,12 +59,16 @@ export const UserProfileIndicator = () => {
     return (
         <div className="space-y-3">
             {/* User Info Card */}
-            <div className="bg-base-100 rounded-lg p-2 border border-base-content/10">
+            <button
+                type="button"
+                className="bg-base-100 rounded-lg p-2 border border-base-content/10 w-full text-left hover:bg-base-200 transition-colors"
+                onClick={() => nav('/profile')}
+            >
                 <div className="flex items-center gap-2">
                     <div className="avatar avatar-placeholder">
-                    <div className="bg-neutral text-neutral-content w-9 rounded-full">
-                        <span className="text-md font-bold">{userProfile.email.charAt(0).toUpperCase()}</span>
-                    </div>
+                        <div className="bg-neutral text-neutral-content w-9 rounded-full flex items-center justify-center">
+                            <span className="text-md font-bold">{userProfile.email.charAt(0).toUpperCase()}</span>
+                        </div>
                     </div>
                     <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-base-content truncate" title={userProfile.email}>
@@ -72,7 +76,7 @@ export const UserProfileIndicator = () => {
                         </p>
                     </div>
                 </div>
-            </div>
+            </button>
             
             {/* Logout Button */}
             <button 
