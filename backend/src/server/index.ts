@@ -3,17 +3,14 @@ import { buildRootRouter } from "../routes/buildRootRouter";
 import express from 'express';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { createContext } from './context';
+import { Dependencies } from "../provideDependencies.types";
 
-const rootRouter = buildRootRouter();
-
-export type AppRouter = typeof rootRouter;
-
-export const buildServer = () => {
+export const buildServer = (deps: Dependencies) => {
   const app = express();
   app.use(
     '/trpc',
     createExpressMiddleware({
-      router: rootRouter,
+      router: buildRootRouter(deps),
       createContext,
     })
   );

@@ -1,1 +1,1 @@
-export { AppRouter } from "./server/index";
+export {AppRouter} from "./routes/buildRootRouter";

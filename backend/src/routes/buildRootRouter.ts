@@ -1,13 +1,19 @@
+import { Dependencies } from "../provideDependencies.types";
 import { publicProcedure, router } from "../server/trpc";
 import { buildAuthRouter } from "./buildAuthRouter";
 
-export const buildRootRouter = () => {
+import { buildFileManagementRouter } from "./fileManagementRouter";
+
+export const buildRootRouter = (deps: Dependencies) => {
     const appRouter = router({
         health: publicProcedure.query(() => {
             return { status: "ok" };
         }),
-        auth: buildAuthRouter()
+        auth: buildAuthRouter(deps),
+        fileManagement: buildFileManagementRouter(deps),
     });
 
-    return appRouter
+    return appRouter;
 }
+
+export type AppRouter = ReturnType<typeof buildRootRouter>;

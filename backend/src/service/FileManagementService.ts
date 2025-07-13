@@ -4,6 +4,13 @@ import { S3Client, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { FileAsset } from "../../prisma/generated/prisma";
 
+type CreateAssetParams = {
+    filename: string;
+    mimeType: string;
+    userId: string;
+    isPublic: boolean;
+}
+
 export class FileManagementService {
     constructor(
         private prisma: PrismaClient,
@@ -11,12 +18,13 @@ export class FileManagementService {
         private bucketName: string
     ) {}
 
-    async createAsset(data: FileAsset) {
+    async createAsset(data: CreateAssetParams) {
+        const s3Key = `${data.userId}/${Date.now()}-${data.filename}`;
         return this.prisma.fileAsset.create({
             data: {
                 filename: data.filename,
                 mimeType: data.mimeType,
-                s3Key: data.s3Key,
+                s3Key: s3Key,
                 userId: data.userId,
                 isPublic: data.isPublic
             }

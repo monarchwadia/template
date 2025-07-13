@@ -2,11 +2,11 @@ import { PrismaClient } from '../../prisma/generated/prisma'
 import { protectedProcedure, publicProcedure, router } from "../server/trpc";
 import { TRPCError } from '@trpc/server';
 import z from 'zod';
-import { provideDependencies } from '../provideDependencies';
+import { Dependencies } from '../provideDependencies.types';
 
 const prisma = new PrismaClient();
 
-export const buildAuthRouter = () => {
+export const buildAuthRouter = (deps: Dependencies) => {
     const authRouter = router({
         register: publicProcedure
             .input(z.object({
@@ -17,7 +17,7 @@ export const buildAuthRouter = () => {
                 if (ctx.userId) {
                     throw new Error('Already authenticated');
                 }
-                const { userService } = provideDependencies();
+                const { userService } = deps;
                 const user = await userService.createUser(
                     input.email,
                     input.password
@@ -40,7 +40,7 @@ export const buildAuthRouter = () => {
                         message: 'Already authenticated'
                     });
                 }
-                const { userService } = provideDependencies();
+                const { userService } = deps;
                 try {
                     const token = await userService.authenticateUser(
                         input.email,
