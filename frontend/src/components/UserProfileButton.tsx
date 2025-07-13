@@ -63,7 +63,7 @@ export const UserProfileIndicator = () => {
                 <div className="flex items-center gap-3">
                     <div className="avatar avatar-placeholder">
                     <div className="bg-neutral text-neutral-content w-10 rounded-full">
-                        <span className="text-lg">D</span>
+                        <span className="text-lg">{userProfile.email.charAt(0).toUpperCase()}</span>
                     </div>
                     </div>
                     <div className="flex-1 min-w-0">
