@@ -23,7 +23,6 @@ export default function MainLayout() {
         {/* Header */}
         <div className="p-6 border-b border-base-content/10 flex items-center justify-between">
           <Link to="/" className="text-2xl font-bold text-primary flex items-center gap-2 hover:text-primary-focus transition-colors">
-            <HiBars3 className="w-6 h-6" />
             Coolproject
           </Link>
           <button
