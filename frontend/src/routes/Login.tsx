@@ -129,6 +129,10 @@ export default function Login() {
             </div>
           )}
         </form>
+        <div className="mt-4 text-center">
+          <span className="text-sm text-base-content/60">Don't have an account?</span>
+          <a href="/register" className="ml-1 link link-primary text-sm">Register</a>
+        </div>
       </div>
     </div>
     </GuardMustBeLoggedOut>

@@ -1,6 +1,6 @@
 import { Link, Outlet } from "react-router-dom";
 import { UserProfileIndicator } from "../components/UserProfileButton";
-import { HiBars3, HiArrowRightOnRectangle, HiUserPlus, HiUser } from "react-icons/hi2";
+import { HiBars3, HiArrowRightOnRectangle, HiUserPlus, HiUser, HiHome } from "react-icons/hi2";
 
 export default function MainLayout() {
   return (
@@ -23,24 +23,10 @@ export default function MainLayout() {
             <div className="space-y-1">
               <Link 
                 className="btn btn-ghost justify-start w-full text-left hover:bg-primary/10 hover:text-primary transition-all duration-200 group" 
-                to="/login"
+                to="/"
               >
-                <HiArrowRightOnRectangle className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
-                Login
-              </Link>
-              <Link 
-                className="btn btn-ghost justify-start w-full text-left hover:bg-primary/10 hover:text-primary transition-all duration-200 group" 
-                to="/register"
-              >
-                <HiUserPlus className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
-                Register
-              </Link>
-              <Link 
-                className="btn btn-ghost justify-start w-full text-left hover:bg-primary/10 hover:text-primary transition-all duration-200 group" 
-                to="/profile"
-              >
-                <HiUser className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
-                Profile
+                <HiHome className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
+                Home
               </Link>
             </div>
           </div>
