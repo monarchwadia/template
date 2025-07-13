@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { UserProfileIndicator } from "../components/UserProfileButton";
-import { HiBars3, HiHome } from "react-icons/hi2";
+import { HiBars3, HiHome, HiDocumentArrowUp } from "react-icons/hi2";
 
 export default function MainLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -47,6 +47,14 @@ export default function MainLayout() {
               >
                 <HiHome className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
                 Home
+              </Link>
+              <Link
+                className="btn btn-ghost justify-start w-full text-left hover:bg-primary/10 hover:text-primary transition-all duration-200 group"
+                to="/file-upload"
+                onClick={() => setSidebarOpen(false)}
+              >
+                <HiDocumentArrowUp className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
+                File Upload
               </Link>
             </div>
           </div>
