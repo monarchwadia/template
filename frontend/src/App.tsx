@@ -16,7 +16,7 @@ export default function App(){
 
     return (
         <div className="flex flex-col items-center justify-center h-full">
-            <h1 className="text-2xl font-bold mb-4">Git Reports</h1>
+            <h1 className="text-2xl font-bold mb-4">Coolproject</h1>
             <p className="text-lg">{message}</p>
         </div>
     )

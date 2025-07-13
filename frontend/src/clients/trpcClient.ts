@@ -1,5 +1,5 @@
 import { createTRPCClient, httpLink } from '@trpc/client';
-import type { AppRouter } from '@git-reports/backend';
+import type { AppRouter } from '@coolproject/backend';
 import { AuthUtils } from '../utils/auth.utils';
 
 const buildTrpcClient = () => {

@@ -94,12 +94,12 @@ importers:
         specifier: ^4.1.11
         version: 4.1.11
     devDependencies:
+      '@coolproject/backend':
+        specifier: workspace:*
+        version: link:../backend
       '@eslint/js':
         specifier: ^9.30.1
         version: 9.30.1
-      '@git-reports/backend':
-        specifier: workspace:*
-        version: link:../backend
       '@types/react':
         specifier: ^19.1.8
         version: 19.1.8
