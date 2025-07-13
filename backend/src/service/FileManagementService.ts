@@ -18,16 +18,34 @@ export class FileManagementService {
         private bucketName: string
     ) {}
 
-    async createAsset(data: CreateAssetParams) {
-        const s3Key = `${data.userId}/${Date.now()}-${data.filename}`;
-        return this.prisma.fileAsset.create({
-            data: {
-                filename: data.filename,
-                mimeType: data.mimeType,
+    /**
+     * Creates a new file asset, generates a signed upload URL, and returns both.
+     * @param data 
+     * @returns 
+     */
+    async createAsset(
+        data: CreateAssetParams
+    ): Promise<{
+        asset: FileAsset;
+        signedUploadUrl: string;
+    }> {
+        return await this.prisma.$transaction(async (tx) => {
+            const s3Key = crypto.randomUUID(); // Generate a unique S3 key for the file
+            const asset = await this.prisma.fileAsset.create({
+                data: {
+                    filename: data.filename,
+                    mimeType: data.mimeType,
+                    s3Key: s3Key,
+                    userId: data.userId,
+                    isPublic: data.isPublic
+                }
+            });
+            const signedUploadUrl = await this.generateUploadSignedUrl({
                 s3Key: s3Key,
-                userId: data.userId,
+                contentType: data.mimeType,
                 isPublic: data.isPublic
-            }
+            });
+            return { asset, signedUploadUrl };
         });
     }
 
@@ -37,29 +55,31 @@ export class FileManagementService {
         });
     }
 
-    async getAssetsByUser(userId: string) {
-        return this.prisma.fileAsset.findMany({
-            where: { userId }
-        });
-    }
+    async deleteAsset(id: string): Promise<FileAsset | null> {
+        return await this.prisma.$transaction(async (tx) => {
+            const asset = await tx.fileAsset.findUnique({
+                where: { id }
+            });
 
-    async deleteAsset(id: string) {
-        return this.prisma.fileAsset.delete({
-            where: { id }
-        });
-    }
+            if (!asset) {
+                return null;
+            }
 
-    async updateAsset(id: string, data: Partial<{ filename: string; type: string; s3Key: string; isPublic: boolean; }>) {
-        return this.prisma.fileAsset.update({
-            where: { id },
-            data
-        });
-    }
+            const { s3Key } = asset;
 
-    async updateAssetFields(id: string, data: Partial<Pick<FileAsset, 'filename' | 'mimeType' | 's3Key' | 'isPublic'>>) {
-        return this.prisma.fileAsset.update({
-            where: { id },
-            data
+            // first, delete the file from the db
+            await tx.fileAsset.delete({
+                where: { id }
+            });
+
+            // Optionally delete the file from S3
+            const deleteCommand = new PutObjectCommand({
+                Bucket: this.bucketName,
+                Key: s3Key,
+            });
+            await this.s3.send(deleteCommand); // Delete the file from S3
+
+            return asset;
         });
     }
 
@@ -77,11 +97,16 @@ export class FileManagementService {
     /**
      * Generate a signed URL for uploading a file to S3
      */
-    async generateUploadSignedUrl(s3Key: string, contentType: string, expiresInSeconds = 3600): Promise<string> {
+    async generateUploadSignedUrl(
+        params: { s3Key: string; contentType: string; isPublic: boolean },
+        expiresInSeconds = 3600
+    ): Promise<string> {
+        const { s3Key, contentType, isPublic } = params;
         const command = new PutObjectCommand({
             Bucket: this.bucketName,
             Key: s3Key,
             ContentType: contentType,
+            ACL: isPublic ? "public-read" : "private",
         });
         return getSignedUrl(this.s3, command, { expiresIn: expiresInSeconds });
     }

@@ -5,11 +5,11 @@ import { MdError, MdLogout } from "react-icons/md";
 
 export const UserProfileIndicator = () => {
     const nav = useNavigate();
-        const {
-            data: userProfile,
-            isLoading,
-            isError
-        } = useUserProfile();
+    const {
+        data: userProfile,
+        isLoading,
+        isError
+    } = useUserProfile();
 
     const handleLogout = () => {
         AuthUtils.clearToken();

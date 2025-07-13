@@ -1,74 +1,76 @@
-import { publicProcedure, router } from "../server/trpc";
+import { protectedProcedure, router } from "../server/trpc";
 import { z } from "zod";
 import { Dependencies } from "../provideDependencies.types";
-
+import { TRPCError } from "@trpc/server";
 
 export const buildFileManagementRouter = (deps: Dependencies) => {
     const fileManagementRouter = router({
-      getAssetById: publicProcedure
-        .input(z.object({ id: z.string().uuid() }))
-        .query(async ({ input }) => {
-          return deps.fileManagementService.getAssetById(input.id);
-        }),
-    
-      getAssetsByUser: publicProcedure
-        .input(z.object({ userId: z.string().uuid() }))
-        .query(async ({ input }) => {
-          return deps.fileManagementService.getAssetsByUser(input.userId);
-        }),
-    
-      createAsset: publicProcedure
-        .input(
-          z.object({
-            filename: z.string(),
-            mimeType: z.string(),
-            s3Key: z.string(),
-            userId: z.string().uuid(),
-            isPublic: z.boolean(),
-          })
-        )
-        .mutation(async ({ input }) => {
-          return deps.fileManagementService.createAsset(input);
-        }),
-    
-      updateAsset: publicProcedure
-        .input(
-          z.object({
-            id: z.string().uuid(),
-            data: z.object({
-              filename: z.string().optional(),
-              mimeType: z.string().optional(),
-              s3Key: z.string().optional(),
-              isPublic: z.boolean().optional(),
+        createAsset: protectedProcedure
+            .input(z.object({
+                fileName: z.string(),
+                fileType: z.string(),
+            }))
+            .output(z.object({
+                asset: z.object({
+                    id: z.string(),
+                    userId: z.string(),
+                    filename: z.string(),
+                    mimeType: z.string(),
+                    isPublic: z.boolean(),
+                    createdAt: z.date(),
+                }),
+                signedUploadUrl: z.string(),
+            }))
+            .mutation(async ({ input, ctx }) => {
+                const { fileManagementService } = deps;
+                if (!ctx.userId) {
+                    throw new Error("User not authenticated");
+                }
+
+                const {asset, signedUploadUrl} = await fileManagementService.createAsset({
+                    userId: ctx.userId,
+                    filename: input.fileName,
+                    mimeType: input.fileType,
+                    isPublic: false // Default to private, can be changed later
+                });
+
+                return { asset, signedUploadUrl };
             }),
-          })
-        )
-        .mutation(async ({ input }) => {
-          return deps.fileManagementService.updateAssetFields(input.id, input.data);
-        }),
-    
-      deleteAsset: publicProcedure
-        .input(z.object({ id: z.string().uuid() }))
-        .mutation(async ({ input }) => {
-          return deps.fileManagementService.deleteAsset(input.id);
-        }),
-    
-      generateDownloadSignedUrl: publicProcedure
-        .input(z.object({ s3Key: z.string() }))
-        .query(async ({ input }) => {
-          return deps.fileManagementService.generateDownloadSignedUrl(input.s3Key);
-        }),
-    
-      generateUploadSignedUrl: publicProcedure
-        .input(
-          z.object({
-            s3Key: z.string(),
-            mimeType: z.string(),
-          })
-        )
-        .query(async ({ input }) => {
-          return deps.fileManagementService.generateUploadSignedUrl(input.s3Key, input.mimeType);
-        }),
+        deleteAsset: protectedProcedure
+            .input(z.object({
+                id: z.string(),
+            }))
+            .mutation(async ({ input, ctx }) => {
+                const { fileManagementService } = deps;
+
+                const asset = await fileManagementService.getAssetById(input.id);
+
+                if (!asset) {
+                    throw new TRPCError({
+                        code: "NOT_FOUND",
+                        message: "Asset not found"
+                    })
+                }
+                if (asset.userId !== ctx.userId) {
+                    throw new TRPCError({
+                        code: "FORBIDDEN",
+                        message: "You do not have permission to delete this asset"
+                    });
+                }
+
+                const deletedAsset = await fileManagementService.deleteAsset(input.id);
+
+                if (!deletedAsset) {
+                    throw new TRPCError({
+                        code: "INTERNAL_SERVER_ERROR",
+                        message: "Failed to delete asset"
+                    });
+                }
+                
+                return {
+                    asset: deletedAsset,
+                };
+            }),
     });
 
     return fileManagementRouter;

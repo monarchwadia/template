@@ -8,7 +8,7 @@ const keys = {
 }
 
 export function useUserProfile() {
-  return useQuery({
+  const userQueryResult = useQuery({
     queryKey: keys.userProfile,
     queryFn: async () => {
       const token = AuthUtils.getToken();
@@ -19,6 +19,8 @@ export function useUserProfile() {
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  return userQueryResult;
 }
 
 export const invalidateUserProfile = () => {
