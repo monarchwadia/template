@@ -10,7 +10,7 @@ export default function MainLayout() {
         <div className="p-6 border-b border-base-content/10">
           <Link to="/" className="text-2xl font-bold text-primary flex items-center gap-2 hover:text-primary-focus transition-colors">
             <HiBars3 className="w-6 h-6" />
-            Git Reports
+            Coolproject
           </Link>
         </div>
         
@@ -58,7 +58,7 @@ export default function MainLayout() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-semibold text-base-content">Dashboard</h2>
-              <p className="text-base-content/60 mt-1">Welcome to your Git Reports dashboard</p>
+              <p className="text-base-content/60 mt-1">Welcome to your Coolproject dashboard</p>
             </div>
             <div className="flex items-center gap-3">
               <div className="badge badge-primary badge-outline">v1.0.0</div>
