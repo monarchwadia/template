@@ -59,18 +59,17 @@ export const UserProfileIndicator = () => {
     return (
         <div className="space-y-3">
             {/* User Info Card */}
-            <div className="bg-base-100 rounded-lg p-3 border border-base-content/10">
-                <div className="flex items-center gap-3">
+            <div className="bg-base-100 rounded-lg p-2 border border-base-content/10">
+                <div className="flex items-center gap-2">
                     <div className="avatar avatar-placeholder">
-                    <div className="bg-neutral text-neutral-content w-10 rounded-full">
-                        <span className="text-lg">{userProfile.email.charAt(0).toUpperCase()}</span>
+                    <div className="bg-neutral text-neutral-content w-9 rounded-full">
+                        <span className="text-md font-bold">{userProfile.email.charAt(0).toUpperCase()}</span>
                     </div>
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-base-content truncate">
+                        <p className="text-sm font-medium text-base-content truncate" title={userProfile.email}>
                             {userProfile.email}
                         </p>
-                        <p className="text-xs text-base-content/60">Online</p>
                     </div>
                 </div>
             </div>
