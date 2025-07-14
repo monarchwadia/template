@@ -41,20 +41,63 @@ We are using S3-compatible APIs for file management.
 
 For local development, you can run the minio docker image, then create a bucket
 
+### Step 0
+
+Initialize python3. For example, with uv
+
+```bash
+uv venv
+source .venv/bin/activate
+uv pip install awscli --upgrade
+```
+
+
 
 ### Step 1
 
 ```bash
-docker run -p 9000:9000 -p 9001:9001 --name coolproject-minio \
-  -e MINIO_ROOT_USER=coolproject-minio -e MINIO_ROOT_PASSWORD=coolproject-minio \
-  minio/minio server /data --console-address ":9001"
+docker run -d -it \
+  -p 4566:4566 \
+  -e SERVICES=s3 \
+  -e DEFAULT_REGION=us-east-1 \
+  -e AWS_ACCESS_KEY_ID=coolproject-minio \
+  -e AWS_SECRET_ACCESS_KEY=coolproject-minio \
+  -e DEBUG=1 \
+  -v "/var/run/docker.sock:/var/run/docker.sock" \
+  --name coolproject-localstack \
+  localstack/localstack
+
 ```
 
-### Step 2
+Then configure
 
-Visit localhost:9000
+```bash
+aws configure
+```
 
-Log in with coolproject-minio/coolproject-minio
+# Then set the following values
+* `AWS Access Key ID`: coolproject-localstack
+* `AWS Secret Access Key`: coolproject-localstack
+* `Default region name`: us-east-1
+* `Default output format`: json
 
-Create a bucket called `coolproject-minio`
+### Step 2 - Create bucket
 
+```bash
+aws --endpoint-url=http://localhost:4566 \
+    s3api create-bucket \
+    --bucket coolproject-localstack \
+    --region us-east-1
+```
+
+### Step 3 - configure cors
+
+There is a file called `localstack/cors.json` that will let you set the cors configuration for the bucket.
+
+```bash
+# From the project rootdir
+aws --endpoint-url=http://localhost:4566 \
+  s3api put-bucket-cors \
+  --bucket coolproject-localstack \
+  --cors-configuration file://localstack/cors.json
+```

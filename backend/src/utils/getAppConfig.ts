@@ -8,6 +8,7 @@ const appConfigSchema = z.object({
   s3AccessKeyId: z.string().min(1, "S3_ACCESS_KEY_ID must be set"),
   s3SecretAccessKey: z.string().min(1, "S3_SECRET_ACCESS_KEY must be set"),
   s3Bucket: z.string().min(1, "S3_BUCKET must be set"),
+  s3Endpoint: z.string().url("S3_ENDPOINT must be a valid URL if provided").optional()
 });
 
 export const getAppConfig = () => {
@@ -18,6 +19,7 @@ export const getAppConfig = () => {
         s3AccessKeyId: process.env.S3_ACCESS_KEY_ID,
         s3SecretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
         s3Bucket: process.env.S3_BUCKET,
+        s3Endpoint: process.env.S3_ENDPOINT
     };
     return appConfigSchema.parse(config);
 }

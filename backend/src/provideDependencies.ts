@@ -19,6 +19,8 @@ export const provideDependencies = (): Dependencies => {
         accessKeyId: appConfig.s3AccessKeyId,
         secretAccessKey: appConfig.s3SecretAccessKey,
       },
+      endpoint: appConfig.s3Endpoint || undefined, // Optional endpoint for local S3 services
+      forcePathStyle: !!appConfig.s3Endpoint, // Required for local S3 services like LocalStack or Min
     });
     instance = {
       userService: new UserService(prisma, jwtService),

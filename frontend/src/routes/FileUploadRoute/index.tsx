@@ -7,18 +7,19 @@ import { useUserProfile } from "../../hooks/useUserProfile";
 export default function FileUploadRoute() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const user = useUserProfile();
-  const userId = user?.id;
+  const userId = user?.data?.id;
 
+  const stuff = useFileUpload({ userId });
   const {
     isUploading,
     uploadError,
     uploadSuccess,
-    handleUpload,
-  } = useFileUpload({ userId });
+    uploadFile,
+  } = stuff;
 
   const handleFileChange = () => {
     if (fileInputRef.current != null && fileInputRef.current.files && fileInputRef.current.files[0]) {
-      handleUpload({ file: fileInputRef.current.files[0] });
+      uploadFile({ file: fileInputRef.current.files[0] });
     }
   };
 
@@ -37,6 +38,9 @@ export default function FileUploadRoute() {
           {uploadError && <div className="text-error">{uploadError}</div>}
           {uploadSuccess && <div className="text-success">File uploaded successfully!</div>}
         </div>
+        <pre>
+          {JSON.stringify(stuff, null, 2)}
+        </pre>
       </div>
     </GuardMustBeLoggedIn>
   );

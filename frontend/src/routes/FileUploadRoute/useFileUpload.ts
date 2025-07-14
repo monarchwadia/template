@@ -1,29 +1,31 @@
 import { useState } from "react";
 import { trpcClient } from "../../clients/trpcClient";
 
-type UseFileUploadParams = {
+type ConfigParams = {
   userId: string | undefined; // User ID for the asset owner
 }
 
 type UploadFileParams = {
-  fileName: string;
-  fileType: string; // MIME type of the file
+  file: File; // The file to upload
 }
 
 export function useFileUpload({
   userId
-}: UseFileUploadParams) {
+}: ConfigParams) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
-  const uploadFile = async ({file: File}) => {
+  const uploadFile = async ({ file }: UploadFileParams) => {
     if (!userId) {
       return;
     }
     setIsUploading(true);
     setUploadError(null);
     setUploadSuccess(false);
+    const fileType = file.type || "application/octet-stream";
+    const fileName = file.name;
+
     try {
       // 1. Request a signed upload URL and asset record from the backend
       const mimeType = fileType || "application/octet-stream";
@@ -34,11 +36,11 @@ export function useFileUpload({
 
       // 2. Upload the file to S3 using the signed URL
       const uploadRes = await fetch(signedUploadUrl, {
-        method: 'PUT',
-        body: selectedFile,
+        method: "PUT",
         headers: {
-          'Content-Type': mimeType,
+          "Content-Type": mimeType,
         },
+        body: file,
       });
 
       if (!uploadRes.ok) throw new Error('Failed to upload file to S3');
@@ -60,6 +62,6 @@ export function useFileUpload({
     isUploading,
     uploadError,
     uploadSuccess,
-    handleUpload: uploadFile,
+    uploadFile,
   };
 }
