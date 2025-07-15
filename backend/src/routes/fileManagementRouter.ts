@@ -82,6 +82,7 @@ export const buildFileManagementRouter = (deps: Dependencies) => {
                 mimeType: z.string(),
                 isPublic: z.boolean(),
                 createdAt: z.date(),
+                downloadUrl: z.string(),
             })))
             .query(async ({ input, ctx }) => {
                 const { fileManagementService } = deps;
@@ -102,7 +103,20 @@ export const buildFileManagementRouter = (deps: Dependencies) => {
                     });
                 }
 
-                return assets;
+                // For each asset, generate a signed download URL
+                const assetsWithUrls = await Promise.all(
+                  assets.map(async (asset) => ({
+                    id: asset.id,
+                    userId: asset.userId,
+                    filename: asset.filename,
+                    mimeType: asset.mimeType,
+                    isPublic: asset.isPublic,
+                    createdAt: asset.createdAt,
+                    downloadUrl: await fileManagementService.generateDownloadSignedUrl(asset.s3Key),
+                  }))
+                );
+
+                return assetsWithUrls;
             }),
     });
 

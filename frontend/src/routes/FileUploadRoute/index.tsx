@@ -56,7 +56,11 @@ export default function FileUploadRoute() {
                     <span className="text-xs break-all mb-2">{file.filename}</span>
                     {/* Replace with actual image preview if you have a URL */}
                     <div className="w-24 h-24 bg-gray-200 flex items-center justify-center">
-                      <span role="img" aria-label="file">📄</span>
+                      <img
+                        src={file.downloadUrl}
+                        alt={file.filename}
+                        className="max-w-full max-h-full object-cover"
+                      />
                     </div>
                   </div>
                 ))
