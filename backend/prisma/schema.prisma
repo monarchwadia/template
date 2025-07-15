@@ -29,6 +29,7 @@ model FileAsset {
   mimeType      String @map("type")
   s3Key     String
   isPublic  Boolean
+  isUploaded Boolean @default(false) // Indicates if the file has been uploaded to S3
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    String

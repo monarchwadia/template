@@ -71,6 +71,22 @@ export const buildFileManagementRouter = (deps: Dependencies) => {
                     asset: deletedAsset,
                 };
             }),
+        confirmUpload: protectedProcedure
+            .input(z.object({ assetId: z.string() }))
+            .mutation(async ({ input, ctx }) => {
+                const { fileManagementService } = deps;
+                if (!ctx.userId) throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Not authenticated' });
+                // Fetch the asset to verify ownership
+                const asset = await fileManagementService.getAssetById(input.assetId);
+                if (!asset || asset.userId !== ctx.userId) {
+                    throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot confirm upload for this asset' });
+                }
+                const updated = await fileManagementService.markAssetAsUploaded(input.assetId);
+                if (!updated) {
+                    throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to confirm upload' });
+                }
+                return { asset: updated };
+            }),
         getAssetsForUser: protectedProcedure
             .input(z.object({
                 userId: z.string(),
@@ -86,17 +102,10 @@ export const buildFileManagementRouter = (deps: Dependencies) => {
             })))
             .query(async ({ input, ctx }) => {
                 const { fileManagementService } = deps;
+                if (input.userId !== ctx.userId) throw new TRPCError({ code: 'FORBIDDEN', message: 'You do not have permission to view these assets' });
+                const assets = await fileManagementService.getUploadedAssetsByUserId(input.userId);
 
-                if (input.userId !== ctx.userId) {
-                    throw new TRPCError({
-                        code: "FORBIDDEN",
-                        message: "You do not have permission to view these assets",
-                    });
-                }
-
-                const assets = await fileManagementService.getAssetsByUserId(input.userId);
-
-                if (!assets) {
+                if (!assets || assets.length === 0) {
                     throw new TRPCError({
                         code: "NOT_FOUND",
                         message: "No assets found for the user",

@@ -29,7 +29,7 @@ export function useFileUpload({
     try {
       // 1. Request a signed upload URL and asset record from the backend
       const mimeType = fileType || "application/octet-stream";
-      const { signedUploadUrl } = await trpcClient.fileManagement.createAsset.mutate({
+      const { asset, signedUploadUrl } = await trpcClient.fileManagement.createAsset.mutate({
         fileName: fileName,
         fileType: mimeType,
       });
@@ -45,6 +45,8 @@ export function useFileUpload({
 
       if (!uploadRes.ok) throw new Error('Failed to upload file to S3');
 
+      // 3. Confirm upload in backend to mark the record as uploaded
+      await trpcClient.fileManagement.confirmUpload.mutate({ assetId: asset.id });
       setUploadSuccess(true);
     } catch (err: unknown) {
       console.error("Upload error:", err);

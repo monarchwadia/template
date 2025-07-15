@@ -110,12 +110,23 @@ export class FileManagementService {
         return getSignedUrl(this.s3, command, { expiresIn: expiresInSeconds });
     }
 
+
     /**
-     * Fetch all assets for a given user ID
+     * Mark an asset as successfully uploaded.
      */
-    async getAssetsByUserId(userId: string): Promise<FileAsset[]> {
+    async markAssetAsUploaded(id: string): Promise<FileAsset | null> {
+        return this.prisma.fileAsset.update({
+            where: { id },
+            data: { isUploaded: true },
+        });
+    }
+
+    /**
+     * Fetch all assets marked as uploaded for a given user ID
+     */
+    async getUploadedAssetsByUserId(userId: string): Promise<FileAsset[]> {
         return this.prisma.fileAsset.findMany({
-            where: { userId },
+            where: { userId, isUploaded: true },
         });
     }
 }
