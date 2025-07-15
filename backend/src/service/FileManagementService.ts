@@ -1,4 +1,3 @@
-
 import { PrismaClient } from "../../prisma/generated/prisma";
 import { S3Client, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -109,5 +108,14 @@ export class FileManagementService {
             ACL: isPublic ? "public-read" : "private",
         });
         return getSignedUrl(this.s3, command, { expiresIn: expiresInSeconds });
+    }
+
+    /**
+     * Fetch all assets for a given user ID
+     */
+    async getAssetsByUserId(userId: string): Promise<FileAsset[]> {
+        return this.prisma.fileAsset.findMany({
+            where: { userId },
+        });
     }
 }

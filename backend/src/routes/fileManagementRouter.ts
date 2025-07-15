@@ -71,6 +71,39 @@ export const buildFileManagementRouter = (deps: Dependencies) => {
                     asset: deletedAsset,
                 };
             }),
+        getAssetsForUser: protectedProcedure
+            .input(z.object({
+                userId: z.string(),
+            }))
+            .output(z.array(z.object({
+                id: z.string(),
+                userId: z.string(),
+                filename: z.string(),
+                mimeType: z.string(),
+                isPublic: z.boolean(),
+                createdAt: z.date(),
+            })))
+            .query(async ({ input, ctx }) => {
+                const { fileManagementService } = deps;
+
+                if (input.userId !== ctx.userId) {
+                    throw new TRPCError({
+                        code: "FORBIDDEN",
+                        message: "You do not have permission to view these assets",
+                    });
+                }
+
+                const assets = await fileManagementService.getAssetsByUserId(input.userId);
+
+                if (!assets) {
+                    throw new TRPCError({
+                        code: "NOT_FOUND",
+                        message: "No assets found for the user",
+                    });
+                }
+
+                return assets;
+            }),
     });
 
     return fileManagementRouter;
