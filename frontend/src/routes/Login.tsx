@@ -21,6 +21,7 @@ export default function Login() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormInputs>({
     mode: "onTouched",
@@ -55,6 +56,15 @@ export default function Login() {
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred. Please try again later.";
       setServerError(errorMessage);
     }
+  };
+
+  // Dev mode quick login handlers
+  const handleDevLogin = (email: string, password: string) => {
+    setValue("email", email, { shouldTouch: true, shouldValidate: true });
+    setValue("password", password, { shouldTouch: true, shouldValidate: true });
+    setTimeout(() => {
+      handleSubmit(onSubmit)();
+    }, 0);
   };
 
   return (
@@ -134,6 +144,27 @@ export default function Login() {
           <a href="/register" className="ml-1 link link-primary text-sm">Register</a>
         </div>
       </div>
+      {import.meta.env.DEV && (
+        <div className="flex flex-col gap-2 mt-6 w-full max-w-sm">
+          <div className="text-center mb-2">
+            <span className="font-semibold text-base-content/80">Demo Credentials</span>
+          </div>
+          <button
+            className="btn btn-outline btn-info w-full"
+            type="button"
+            onClick={() => handleDevLogin('user@user.com', 'password')}
+          >
+            Login as user
+          </button>
+          <button
+            className="btn btn-outline btn-secondary w-full"
+            type="button"
+            onClick={() => handleDevLogin('admin@admin.com', 'password')}
+          >
+            Login as admin
+          </button>
+        </div>
+      )}
     </div>
     </GuardMustBeLoggedOut>
   );
