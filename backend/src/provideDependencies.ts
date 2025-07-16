@@ -4,6 +4,7 @@ import { FileManagementService } from "./service/FileManagementService";
 import { S3Client } from "@aws-sdk/client-s3";
 import { JwtService } from "./service/JwtService";
 import { UserService } from "./service/UserService";
+import { CommunityService } from "./service/CommunityService";
 import { getAppConfig } from "./utils/getAppConfig";
 
 let instance: Dependencies | null = null;
@@ -25,6 +26,7 @@ export const provideDependencies = (): Dependencies => {
     instance = {
       userService: new UserService(prisma, jwtService),
       fileManagementService: new FileManagementService(prisma, s3, appConfig.s3Bucket),
+      communityService: new CommunityService(prisma),
       prisma: prisma
     };
   }

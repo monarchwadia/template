@@ -12,7 +12,7 @@ export const buildRootRouter = (deps: Dependencies) => {
         }),
         auth: buildAuthRouter(deps),
         fileManagement: buildFileManagementRouter(deps),
-        community: buildCommunityRouter(),
+        community: buildCommunityRouter(deps),
     });
 
     return appRouter;
