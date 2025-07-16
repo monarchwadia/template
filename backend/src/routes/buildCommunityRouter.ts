@@ -118,6 +118,52 @@ export const buildCommunityRouter = (deps: Dependencies) => {
             data: { archivedAt: new Date() },
           });
         }),
+
+      // Join a community (members only)
+      join: protectedProcedure
+        .input(z.object({ slug: z.string() }))
+        .mutation(async ({ input, ctx }) => {
+          const community = await prisma.community.findUnique({ where: { slug: input.slug } });
+          if (!community) throw new TRPCError({ code: "NOT_FOUND", message: "Community not found" });
+          // Check if already a member
+          const existing = await prisma.userCommunity.findUnique({
+            where: {
+              userId_communityId: {
+                userId: ctx.userId,
+                communityId: community.id,
+              },
+            },
+          });
+          if (existing) return { joined: true };
+          await prisma.userCommunity.create({
+            data: {
+              userId: ctx.userId,
+              communityId: community.id,
+            },
+          });
+          return { joined: true };
+        }),
+
+      // Leave a community (members only)
+      leave: protectedProcedure
+        .input(z.object({ slug: z.string() }))
+        .mutation(async ({ input, ctx }) => {
+          const community = await prisma.community.findUnique({ where: { slug: input.slug } });
+          if (!community) throw new TRPCError({ code: "NOT_FOUND", message: "Community not found" });
+          // Don't allow owner to leave their own community
+          if (community.ownerId === ctx.userId) {
+            throw new TRPCError({ code: "FORBIDDEN", message: "Owner cannot leave their own community" });
+          }
+          await prisma.userCommunity.delete({
+            where: {
+              userId_communityId: {
+                userId: ctx.userId,
+                communityId: community.id,
+              },
+            },
+          });
+          return { left: true };
+        }),
     });
     return communityRouter;
 }
