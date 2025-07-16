@@ -39,16 +39,19 @@ model FileAsset {
 }
 
 model Community {
-  id                    String          @id @default(uuid())
-  name                  String
-  slug                  String          @unique
-  ownerId               String
-  description           String?
-  createdAt             DateTime        @default(now())
-  updatedAt             DateTime        @updatedAt
-  owner                 User            @relation("CommunityOwner", fields: [ownerId], references: [id])
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  ownerId     String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  archivedAt  DateTime? // Nullable field for archiving
+
+  owner User @relation("CommunityOwner", fields: [ownerId], references: [id])
+
   joinedUserCommunities UserCommunity[]
-  archivedAt            DateTime?       // Nullable field for archiving
+  calendarEvents        CalendarEvent[]
 }
 
 model UserCommunity {
@@ -60,4 +63,19 @@ model UserCommunity {
   community Community @relation(fields: [communityId], references: [id])
 
   @@id([userId, communityId])
+}
+
+model CalendarEvent {
+  id          String    @id @default(uuid())
+  title       String
+  desc        String?
+  location    String?
+  startDt     DateTime
+  endDt       DateTime
+  timezone    String    @default("UTC")
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  communityId String
+  community   Community @relation(fields: [communityId], references: [id])
 }
