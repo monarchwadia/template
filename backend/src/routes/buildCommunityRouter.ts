@@ -1,6 +1,6 @@
 import { PrismaClient } from '../../prisma/generated/prisma'
 import { router, publicProcedure, protectedProcedure } from "../server/trpc";
-import { z } from "zod";
+import { number, z } from "zod";
 import { TRPCError } from "@trpc/server";
 
 const prisma = new PrismaClient();
@@ -12,6 +12,7 @@ const communityPublicSelect = {
   description: true,
   createdAt: true,
   updatedAt: true,
+  ownerId: true,
   // add more public fields as needed
 };
 
@@ -56,37 +57,60 @@ export const buildCommunityRouter = () => {
         });
       }),
 
-      // View public data of a community (anyone)
-      getPublic: publicProcedure
+      // View community data (public for everyone, private for members)
+      get: publicProcedure
         .input(z.object({ slug: z.string() }))
-        .query(async ({ input }) => {
-          const community = await prisma.community.findUnique({
+        .query(async ({ input, ctx }) => {
+          // First get the public data
+          const publicCommunity = await prisma.community.findUnique({
             where: { slug: input.slug },
             select: communityPublicSelect,
           });
-          if (!community) throw new TRPCError({ code: "NOT_FOUND", message: "Community not found" });
-          return community;
-        }),
+          if (!publicCommunity) throw new TRPCError({ code: "NOT_FOUND", message: "Community not found" });
 
-      // View full data (members only)
-      getFull: protectedProcedure
-        .input(z.object({ slug: z.string() }))
-        .query(async ({ input, ctx }) => {
-          const community = await prisma.community.findUnique({
-            where: { slug: input.slug },
-            include: {
-              joinedUserCommunities: {
-                where: { userId: ctx.userId },
-                select: { userId: true, communityId: true, joinedAt: true },
+          let isMember = false;
+          let isOwner = false;
+
+          type PrivateCommunityProfile = {
+            numberOfMembers: number;
+          }
+          let privateCommunityProfile: PrivateCommunityProfile | null = null;
+
+          if (ctx.userId) {
+            // Check if the user is a member of the community
+            const userCommunity = await prisma.userCommunity.findFirst({
+              where: {
+                userId: ctx.userId,
+                community: { slug: input.slug },
               },
-            },
-          });
-          if (!community) throw new TRPCError({ code: "NOT_FOUND", message: "Community not found" });
-          const isMember = community.joinedUserCommunities.some(j => j.userId === ctx.userId);
-          if (!isMember && community.ownerId !== ctx.userId) throw new TRPCError({ code: "FORBIDDEN", message: "Not a member" });
-          // Remove owner and joinedUserCommunities from the returned object
-          const { owner, joinedUserCommunities, ...publicData } = community as any;
-          return publicData;
+            });
+
+            if (userCommunity) {
+              isMember = true;
+            }
+
+            // Check if the user is the owner of the community
+            if (publicCommunity.ownerId === ctx.userId) {
+              isOwner = true;
+            }
+
+            // If user is a member or owner, get private data
+            if (isMember || isOwner) {
+              const numberOfMembers = await prisma.userCommunity.count({
+                where: { community: { slug: input.slug } }
+              });
+              privateCommunityProfile = {
+                numberOfMembers
+              }
+            }
+          }
+
+          return {
+            publicCommunityProfile: publicCommunity,
+            privateCommunityProfile,
+            isMember,
+            isOwner,
+          };
         }),
 
       // Update community (owners only)

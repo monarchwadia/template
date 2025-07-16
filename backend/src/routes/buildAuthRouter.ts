@@ -58,10 +58,44 @@ export const buildAuthRouter = (deps: Dependencies) => {
             .query(async ({ ctx }) => {
                 const user = await prisma.user.findUnique({
                     where: { id: ctx.userId },
-                    select: { id: true, email: true }
+                    select: {
+                        id: true,
+                        email: true,
+                        ownedCommunities: {
+                            select: {
+                                id: true,
+                                name: true,
+                                slug: true,
+                                description: true,
+                                createdAt: true,
+                                updatedAt: true,
+                            }
+                        },
+                        joinedUserCommunities: {
+                            select: {
+                                community: {
+                                    select: {
+                                        id: true,
+                                        name: true,
+                                        slug: true,
+                                        description: true,
+                                        createdAt: true,
+                                        updatedAt: true,
+                                    }
+                                }
+                            }
+                        }
+                    }
                 });
                 if (!user) throw new Error('User not found');
-                return user;
+                // Flatten joinedUserCommunities to just an array of communities
+                const joinedCommunities = user.joinedUserCommunities.map(j => j.community);
+                return {
+                    id: user.id,
+                    email: user.email,
+                    ownedCommunities: user.ownedCommunities,
+                    joinedCommunities,
+                };
             })
     });
     return authRouter;
