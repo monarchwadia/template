@@ -48,6 +48,7 @@ model Community {
   updatedAt             DateTime        @updatedAt
   owner                 User            @relation("CommunityOwner", fields: [ownerId], references: [id])
   joinedUserCommunities UserCommunity[]
+  archivedAt            DateTime?       // Nullable field for archiving
 }
 
 model UserCommunity {
