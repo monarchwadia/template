@@ -15,23 +15,48 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String  @unique
-  passwordHash  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  assets    FileAsset[]
+  id                    String          @id @default(uuid())
+  email                 String          @unique
+  passwordHash          String
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  assets                FileAsset[]
+  joinedUserCommunities UserCommunity[]
+  ownedCommunities      Community[]     @relation("CommunityOwner")
 }
 
 model FileAsset {
-  id        String   @id @default(uuid())
-  filename  String
-  mimeType      String @map("type")
-  s3Key     String
-  isPublic  Boolean
-  isUploaded Boolean @default(false) // Indicates if the file has been uploaded to S3
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  id         String   @id @default(uuid())
+  filename   String
+  mimeType   String   @map("type")
+  s3Key      String
+  isPublic   Boolean
+  isUploaded Boolean  @default(false) // Indicates if the file has been uploaded to S3
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model Community {
+  id                    String          @id @default(uuid())
+  name                  String
+  slug                  String          @unique
+  ownerId               String
+  description           String?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  owner                 User            @relation("CommunityOwner", fields: [ownerId], references: [id])
+  joinedUserCommunities UserCommunity[]
+}
+
+model UserCommunity {
+  userId      String
+  communityId String
+  joinedAt    DateTime @default(now())
+
+  user      User      @relation(fields: [userId], references: [id])
+  community Community @relation(fields: [communityId], references: [id])
+
+  @@id([userId, communityId])
 }
