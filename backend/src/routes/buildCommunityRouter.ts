@@ -2,7 +2,6 @@ import { PrismaClient } from '../../prisma/generated/prisma'
 import { router, publicProcedure, protectedProcedure } from "../server/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { Dependencies } from '../provideDependencies.types';
 
 const prisma = new PrismaClient();
 
@@ -23,7 +22,7 @@ async function requireCommunityOwnerOrThrow(slug: string, userId: string, prisma
   return community;
 }
 
-export const buildCommunityRouter = (deps: Dependencies) => {
+export const buildCommunityRouter = () => {
     const communityRouter = router({
       // Create a community (anyone)
       create: publicProcedure
