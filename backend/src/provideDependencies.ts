@@ -25,6 +25,7 @@ export const provideDependencies = (): Dependencies => {
     instance = {
       userService: new UserService(prisma, jwtService),
       fileManagementService: new FileManagementService(prisma, s3, appConfig.s3Bucket),
+      prisma: prisma
     };
   }
 
