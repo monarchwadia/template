@@ -15,7 +15,7 @@ export default function CommunityList() {
           {data.map((community) => (
             <li key={community.id} className="card bg-base-100 shadow p-4 flex flex-col md:flex-row md:items-center md:justify-between">
               <div>
-                <Link to={`/communities/${community.slug}`} className="link link-primary text-lg font-semibold">
+                <Link to={`/c/${community.slug}`} className="link link-primary text-lg font-semibold">
                   {community.name}
                 </Link>
                 <div className="text-base-content/60 text-sm">{community.description}</div>

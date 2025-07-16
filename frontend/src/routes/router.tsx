@@ -19,9 +19,9 @@ export const router = createBrowserRouter([
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
       { path: "profile", element: <Profile /> },
-      { path: "file-upload", element: <FileUploadRoute /> }, // Add FileUploadRoute here
+      { path: "file-upload", element: <FileUploadRoute /> },
       { path: "communities", element: <CommunityList /> }, // List all communities
-      { path: "communities/:slug", element: <CommunityView /> }, // View a single community
+      { path: "c/:slug", element: <CommunityView /> }, // View a single community at /c/:slug
       { path: "", element: <App /> }, // Home page
     ],
   },
