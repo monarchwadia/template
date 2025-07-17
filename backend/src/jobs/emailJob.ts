@@ -46,11 +46,3 @@ export async function processEmailOutbox() {
 processEmailOutbox()
 .then(() => console.log('[emailJob] Email processing completed'))
 .catch(console.error);
-
-// // Example: run every 10 seconds if run directly
-// if (require.main === module) {
-//     setInterval(() => {
-//         processEmailOutbox().catch(console.error);
-//     }, 10000);
-//     console.log('[emailJob] Email job started. Processing every 10 seconds...');
-// }

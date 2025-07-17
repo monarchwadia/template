@@ -9,6 +9,7 @@ import MainLayout from "./MainLayout";
 import FileUploadRoute from "./FileUploadRoute";
 import CommunityList from "./CommunityList";
 import CommunityView from "./CommunityView";
+import CreateEvent from "./CreateEvent";
 
 
 export const router = createBrowserRouter([
@@ -22,6 +23,7 @@ export const router = createBrowserRouter([
       { path: "file-upload", element: <FileUploadRoute /> },
       { path: "communities", element: <CommunityList /> }, // List all communities
       { path: "c/:slug", element: <CommunityView /> }, // View a single community at /c/:slug
+      { path: "c/:slug/create-event", element: <CreateEvent /> }, // Create event route
       { path: "", element: <App /> }, // Home page
     ],
   },

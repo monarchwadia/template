@@ -15,9 +15,12 @@ export const buildCalendarEventsRouter = (deps: Dependencies) => {
                 startDt: z.string().datetime(),
                 endDt: z.string().datetime(),
                 timezone: z.string().optional(),
-                communityId: z.string().uuid(),
+                slug: z.string(), // now accepts slug
             }))
             .mutation(async ({ input, ctx }) => {
+                // Look up community by slug
+                const community = await deps.prisma.community.findUnique({ where: { slug: input.slug } });
+                if (!community) throw new TRPCError({ code: 'NOT_FOUND', message: 'Community not found' });
                 return calendarEventsService.createCalendarEvent({
                     title: input.title,
                     desc: input.desc,
@@ -25,7 +28,7 @@ export const buildCalendarEventsRouter = (deps: Dependencies) => {
                     startDt: new Date(input.startDt),
                     endDt: new Date(input.endDt),
                     timezone: input.timezone,
-                    communityId: input.communityId,
+                    communityId: community.id,
                 }, ctx.userId);
             }),
 

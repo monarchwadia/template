@@ -1,5 +1,5 @@
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useCommunity } from "../hooks/useCommunityPublic";
 import { useCommunityCalendarEvents } from "../hooks/useCommunityCalendarEvents";
 import { useJoinCommunity } from "../hooks/useJoinCommunity";
@@ -10,6 +10,7 @@ import { JoinCommunityNotice } from "./JoinCommunityNotice";
 
 export default function CommunityView() {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const { data, isLoading, error } = useCommunity(slug);
   const joinMutation = useJoinCommunity();
   const leaveMutation = useLeaveCommunity();
@@ -35,7 +36,26 @@ export default function CommunityView() {
   } = useCommunityCalendarEvents(communityId);
 
   return (
-    <div className="container mx-auto py-8">
+    <>
+      {/* Owner header bar */}
+      {data?.isOwner && (
+        <div className="mb-6">
+          <div className="navbar bg-base-200 rounded-box shadow-lg px-4">
+            <div className="flex-1">
+              <span className="font-semibold text-lg ml-2">You are the owner of this community</span>
+            </div>
+            <div className="flex-none">
+              <button
+                className="btn btn-accent btn-sm "
+                onClick={() => navigate(`/c/${slug}/create-event`)}
+              >
+                Create Event
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      <div className="container mx-auto py-8">
       {isLoading && <div className="loading loading-spinner loading-md" />}
       {error && <div className="alert alert-error">Error loading community.</div>}
       {!isLoading && !error && !data && (
@@ -155,6 +175,7 @@ export default function CommunityView() {
           </div>
         </>
       )}
-    </div>
+      </div>
+    </>
   );
 }
