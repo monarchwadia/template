@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "tsx --watch src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "job:email": "tsx src/jobs/emailJob.ts"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +20,7 @@
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.0.11",
+    "@types/nodemailer": "^6.4.17",
     "prisma": "^6.11.1",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
@@ -34,6 +36,7 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^7.0.5",
     "zod": "^3.25.76"
   }
 }
