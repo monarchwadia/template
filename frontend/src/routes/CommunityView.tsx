@@ -2,6 +2,8 @@
 import { useParams } from "react-router-dom";
 import { useCommunity } from "../hooks/useCommunityPublic";
 import { useCommunityCalendarEvents } from "../hooks/useCommunityCalendarEvents";
+import { useJoinCommunity } from "../hooks/useJoinCommunity";
+import { useLeaveCommunity } from "../hooks/useLeaveCommunity";
 import { HiUserGroup, HiUserCircle, HiStar } from "react-icons/hi2";
 import { HiOutlineCalendar, HiOutlineLocationMarker, HiOutlineClock, HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 import { JoinCommunityNotice } from "./JoinCommunityNotice";
@@ -9,6 +11,8 @@ import { JoinCommunityNotice } from "./JoinCommunityNotice";
 export default function CommunityView() {
   const { slug } = useParams();
   const { data, isLoading, error } = useCommunity(slug);
+  const joinMutation = useJoinCommunity();
+  const leaveMutation = useLeaveCommunity();
 
   let statusIcon = <HiUserGroup className="inline w-5 h-5 text-base-content/40 mr-1" title="Public" />;
   let statusText = "Public";
@@ -51,9 +55,29 @@ export default function CommunityView() {
                 <span className="ml-4">Members: {memberCount}</span>
               )}
             </div>
-            <div className="mb-4">
+            <div className="mb-4 flex items-center gap-4">
               {data.publicCommunityProfile.description || (
                 <span className="italic text-base-content/40">No description</span>
+              )}
+              {/* Join/Leave Button */}
+              {!(data.isOwner) && (
+                data.isMember ? (
+                  <button
+                    className="btn btn-outline btn-error btn-sm"
+                    onClick={() => leaveMutation.mutate(slug!)}
+                    disabled={leaveMutation.isPending}
+                  >
+                    {leaveMutation.isPending ? 'Leaving...' : 'Leave Community'}
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => joinMutation.mutate(slug!)}
+                    disabled={joinMutation.isPending}
+                  >
+                    {joinMutation.isPending ? 'Joining...' : 'Join Community'}
+                  </button>
+                )
               )}
             </div>
             <div className="text-xs text-base-content/40">
