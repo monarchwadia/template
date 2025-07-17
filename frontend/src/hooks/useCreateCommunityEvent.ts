@@ -11,6 +11,7 @@ export function useCreateCommunityEvent() {
       startDt: string;
       endDt: string;
       timezone: string;
+      publish: boolean;
     }) => {
       return trpcClient.calendarEvents.create.mutate(input);
     },

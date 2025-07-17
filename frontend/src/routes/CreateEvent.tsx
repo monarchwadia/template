@@ -1,9 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
 import { useState } from "react";
 import { useCreateCommunityEvent } from "../hooks/useCreateCommunityEvent";
+
 
 const eventSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -11,7 +12,8 @@ const eventSchema = z.object({
   location: z.string().optional(),
   startDt: z.string().min(1, "Start date/time is required"),
   endDt: z.string().min(1, "End date/time is required"),
-  timezone: z.string().min(1, "Timezone is required")
+  timezone: z.string().min(1, "Timezone is required"),
+  publish: z.boolean()
 });
 
 type EventForm = z.infer<typeof eventSchema>;
@@ -28,7 +30,8 @@ export default function CreateEvent() {
   } = useForm<EventForm>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      publish: true
     }
   });
 
@@ -48,14 +51,19 @@ export default function CreateEvent() {
         return date.toISOString();
       };
       await createEventMutation.mutateAsync({
-        communityId: slug,
+        slug,
         ...data,
         startDt: toIso(data.startDt),
-        endDt: toIso(data.endDt)
+        endDt: toIso(data.endDt),
+        publish: data.publish
       });
       navigate(`/c/${slug}`);
-    } catch (err: any) {
-      setSubmitError(err.message || "Failed to create event");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setSubmitError(err.message);
+      } else {
+        setSubmitError("Failed to create event");
+      }
       console.error(err);
     }
   };
@@ -124,6 +132,12 @@ export default function CreateEvent() {
           </label>
           <input type="text" className="input input-bordered w-full" {...register("timezone")}/>
           {errors.timezone && <span className="text-error text-xs">{errors.timezone.message}</span>}
+        </div>
+        <div className="form-control">
+          <label className="label cursor-pointer justify-start gap-4">
+            <input type="checkbox" className="toggle toggle-primary" defaultChecked {...register("publish")}/>
+            <span className="label-text">Publish Event</span>
+          </label>
         </div>
         {submitError && <div className="alert alert-error mt-2">{submitError}</div>}
         <div className="flex justify-end items-center gap-2 mt-4">
