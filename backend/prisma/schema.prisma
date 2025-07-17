@@ -80,3 +80,14 @@ model CalendarEvent {
   communityId   String
   community     Community @relation(fields: [communityId], references: [id])
 }
+
+model EmailOutbox {
+  id           String    @id @default(uuid())
+  to           String
+  subject      String
+  body         String
+  sentAt       DateTime?
+  error        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}

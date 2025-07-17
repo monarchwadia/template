@@ -1,28 +1,36 @@
+
+import { PrismaClient } from '../../prisma/generated/prisma';
+
 export class EmailService {
-    constructor() {}
+    constructor(private readonly prisma: PrismaClient) {}
 
     async sendEventUpdatedEmail(eventId: string, eventTitle: string, recipientEmails: string[]): Promise<void> {
-        console.log(`[EmailService] Sending event updated email for event "${eventTitle}" (ID: ${eventId})`);
-        console.log(`[EmailService] Recipients: ${recipientEmails.join(', ')}`);
-        console.log(`[EmailService] Email content: Event "${eventTitle}" has been updated. Please check the latest details.`);
-        
-        // TODO: Implement actual email sending logic
-        // This could use services like SendGrid, AWS SES, Nodemailer, etc.
+        const subject = `Event Updated: ${eventTitle}`;
+        const body = `Event "${eventTitle}" has been updated. Please check the latest details.`;
+        await Promise.all(recipientEmails.map(to =>
+            this.prisma.emailOutbox.create({
+                data: { to, subject, body }
+            })
+        ));
     }
 
     async sendEventCancelledEmail(eventId: string, eventTitle: string, recipientEmails: string[]): Promise<void> {
-        console.log(`[EmailService] Sending event cancelled email for event "${eventTitle}" (ID: ${eventId})`);
-        console.log(`[EmailService] Recipients: ${recipientEmails.join(', ')}`);
-        console.log(`[EmailService] Email content: Event "${eventTitle}" has been cancelled. We apologize for any inconvenience.`);
-        
-        // TODO: Implement actual email sending logic
+        const subject = `Event Cancelled: ${eventTitle}`;
+        const body = `Event "${eventTitle}" has been cancelled. We apologize for any inconvenience.`;
+        await Promise.all(recipientEmails.map(to =>
+            this.prisma.emailOutbox.create({
+                data: { to, subject, body }
+            })
+        ));
     }
 
     async sendEventPublishedEmail(eventId: string, eventTitle: string, recipientEmails: string[]): Promise<void> {
-        console.log(`[EmailService] Sending event published email for event "${eventTitle}" (ID: ${eventId})`);
-        console.log(`[EmailService] Recipients: ${recipientEmails.join(', ')}`);
-        console.log(`[EmailService] Email content: Event "${eventTitle}" has been published and is now available for registration.`);
-        
-        // TODO: Implement actual email sending logic
+        const subject = `Event Published: ${eventTitle}`;
+        const body = `Event "${eventTitle}" has been published and is now available for registration.`;
+        await Promise.all(recipientEmails.map(to =>
+            this.prisma.emailOutbox.create({
+                data: { to, subject, body }
+            })
+        ));
     }
 }

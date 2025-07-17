@@ -25,7 +25,7 @@ export const provideDependencies = (): Dependencies => {
       endpoint: appConfig.s3Endpoint || undefined, // Optional endpoint for local S3 services
       forcePathStyle: !!appConfig.s3Endpoint, // Required for local S3 services like LocalStack or Min
     });
-    const emailService = new EmailService();
+    const emailService = new EmailService(prisma);
     instance = {
       userService: new UserService(prisma, jwtService),
       fileManagementService: new FileManagementService(prisma, s3, appConfig.s3Bucket),
