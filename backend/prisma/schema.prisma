@@ -66,16 +66,17 @@ model UserCommunity {
 }
 
 model CalendarEvent {
-  id          String    @id @default(uuid())
-  title       String
-  desc        String?
-  location    String?
-  startDt     DateTime
-  endDt       DateTime
-  timezone    String    @default("UTC")
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  communityId String
-  community   Community @relation(fields: [communityId], references: [id])
+  id            String    @id @default(uuid())
+  title         String
+  desc          String?
+  location      String?
+  startDt       DateTime
+  endDt         DateTime
+  timezone      String    @default("UTC")
+  cancelledAt   DateTime?
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  communityId   String
+  community     Community @relation(fields: [communityId], references: [id])
 }

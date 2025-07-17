@@ -5,6 +5,8 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { JwtService } from "./service/JwtService";
 import { UserService } from "./service/UserService";
 import { CommunityService } from "./service/CommunityService";
+import { CalendarEventsService } from "./service/CalendarEventsService";
+import { EmailService } from "./service/EmailService";
 import { getAppConfig } from "./utils/getAppConfig";
 
 let instance: Dependencies | null = null;
@@ -23,10 +25,13 @@ export const provideDependencies = (): Dependencies => {
       endpoint: appConfig.s3Endpoint || undefined, // Optional endpoint for local S3 services
       forcePathStyle: !!appConfig.s3Endpoint, // Required for local S3 services like LocalStack or Min
     });
+    const emailService = new EmailService();
     instance = {
       userService: new UserService(prisma, jwtService),
       fileManagementService: new FileManagementService(prisma, s3, appConfig.s3Bucket),
       communityService: new CommunityService(prisma),
+      calendarEventsService: new CalendarEventsService(prisma, emailService),
+      emailService: emailService,
       prisma: prisma
     };
   }
