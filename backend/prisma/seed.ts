@@ -15,7 +15,8 @@ async function main() {
         await prisma.user.deleteMany();
 
         // Create a dummy user
-        const user = await userService.createUser("user@user.com", "password");
+        const ownerUser = await userService.createUser("owner@owner.com", "password");
+        const userUser = await userService.createUser("user@user.com", "password");
 
         // Add dummy communities using the CommunityService
         const communitySeeds = [
@@ -48,7 +49,7 @@ async function main() {
         const { calendarEventsService } = deps;
         const createdCommunities = [];
         for (const community of communitySeeds) {
-            const created = await communityService.createCommunity(community, user.id);
+            const created = await communityService.createCommunity(community, ownerUser.id);
             createdCommunities.push(created);
         }
 
@@ -63,7 +64,7 @@ async function main() {
                 startDt: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
                 endDt: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000), // +2 hours
                 communityId: community.id,
-            }, user.id);
+            }, ownerUser.id);
 
             // Event 2: Another future event
             await calendarEventsService.createCalendarEvent({
@@ -73,7 +74,7 @@ async function main() {
                 startDt: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
                 endDt: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000 + 3 * 60 * 60 * 1000), // +3 hours
                 communityId: community.id,
-            }, user.id);
+            }, ownerUser.id);
         }
     } finally {
         await prisma.$disconnect();

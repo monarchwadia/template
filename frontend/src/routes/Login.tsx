@@ -152,16 +152,16 @@ export default function Login() {
           <button
             className="btn btn-outline btn-info w-full"
             type="button"
-            onClick={() => handleDevLogin('user@user.com', 'password')}
+            onClick={() => handleDevLogin('owner@owner.com', 'password')}
           >
-            Login as user
+            Login as owner of communities
           </button>
           <button
             className="btn btn-outline btn-secondary w-full"
             type="button"
-            onClick={() => handleDevLogin('admin@admin.com', 'password')}
+            onClick={() => handleDevLogin('user@user.com', 'password')}
           >
-            Login as admin
+            Login as normal member
           </button>
         </div>
       )}
