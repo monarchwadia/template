@@ -1,6 +1,4 @@
-import {
-  createBrowserRouter,
-} from "react-router";
+import { createBrowserRouter } from "react-router";
 import App from "../App";
 import Login from "./Login";
 import Register from "./Register";
@@ -11,7 +9,6 @@ import CommunityList from "./CommunityList";
 import CommunityView from "./CommunityView";
 import CreateEvent from "./CreateEvent";
 import EventView from "./EventView";
-
 
 export const router = createBrowserRouter([
   {
@@ -30,4 +27,3 @@ export const router = createBrowserRouter([
     ],
   },
 ]);
-

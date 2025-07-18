@@ -78,7 +78,7 @@ export class CalendarEventsService {
     });
   }
 
-  async viewCalendarEvent(eventId: string, userId?: string) {
+  async viewCalendarEvent(eventId: string) {
     const event = await this.prisma.calendarEvent.findUnique({
       where: { id: eventId },
       include: {
@@ -90,40 +90,6 @@ export class CalendarEventsService {
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "Calendar event not found",
-      });
-    }
-
-    // Check if user is a member of the community or the owner
-    if (userId) {
-      const isOwner = event.community.ownerId === userId;
-      const isMember = await this.prisma.userCommunity.findUnique({
-        where: {
-          userId_communityId: {
-            userId: userId,
-            communityId: event.communityId,
-          },
-        },
-      });
-
-      if (!isOwner && !isMember) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You must be a member of the community to view this event",
-        });
-      }
-
-      // If event is not published, only community owner can view it
-      if (!event.publishedAt && !isOwner) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "Event is not published",
-        });
-      }
-    } else {
-      // Not logged in - cannot view any events
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: "You must be logged in to view events",
       });
     }
 
@@ -375,31 +341,18 @@ export class CalendarEventsService {
     return unpublishedEvent;
   }
 
-  async listCalendarEvents(communityId?: string, userId?: string) {
+  async listCalendarEvents(
+    communityId?: string,
+    showUnpublished: boolean = false
+  ) {
     const where: any = {};
 
     if (communityId) {
       where.communityId = communityId;
     }
 
-    // Only show published events for non-owners
-    if (userId) {
-      // Check if user is owner of any communities with events
-      const ownedCommunities = await this.prisma.community.findMany({
-        where: { ownerId: userId },
-        select: { id: true },
-      });
-      const ownedCommunityIds = ownedCommunities.map((c) => c.id);
-
-      if (ownedCommunityIds.length > 0) {
-        where.OR = [
-          { publishedAt: { not: null } },
-          { communityId: { in: ownedCommunityIds } },
-        ];
-      } else {
-        where.publishedAt = { not: null };
-      }
-    } else {
+    // Only show published events unless showUnpublished is true
+    if (!showUnpublished) {
       where.publishedAt = { not: null };
     }
 
