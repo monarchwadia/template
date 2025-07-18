@@ -16,12 +16,15 @@ export default function MainLayout() {
       )}
       {/* Sidebar */}
       <aside
-        className={`fixed z-50 md:static top-0 left-0 h-full w-64 bg-base-300 shadow-xl border-r border-base-content/10 flex flex-col transition-transform duration-200 md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
+        className={`fixed z-50 md:static top-0 left-0 h-full w-64 bg-base-300 shadow-xl border-r border-base-content/10 flex flex-col transition-transform duration-200 md:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
         style={{ minWidth: 0 }}
       >
         {/* Header */}
         <div className="p-6 border-b border-base-content/10 flex items-center justify-between">
-          <Link to="/" className="text-2xl font-bold text-primary flex items-center gap-2 hover:text-primary-focus transition-colors">
+          <Link
+            to="/"
+            className="text-2xl font-bold text-primary flex items-center gap-2 hover:text-primary-focus transition-colors"
+          >
             Coolproject
           </Link>
           <button
@@ -39,8 +42,8 @@ export default function MainLayout() {
               Navigation
             </h2>
             <div className="space-y-1">
-              <Link 
-                className="btn btn-ghost justify-start w-full text-left hover:bg-primary/10 hover:text-primary transition-all duration-200 group" 
+              <Link
+                className="btn btn-ghost justify-start w-full text-left hover:bg-primary/10 hover:text-primary transition-all duration-200 group"
                 to="/"
                 onClick={() => setSidebarOpen(false)}
               >

@@ -60,8 +60,72 @@ async function main() {
       createdCommunities.push(created);
     }
 
-    // Add dummy calendar events for each community
     const now = new Date();
+    // Hardcode Toronto Zendo West community and events
+    const torontoZendo = await communityService.createCommunity(
+      {
+        name: "Toronto Zendo West",
+        slug: "torontozendo",
+        description:
+          " We are a small sitting group in Toronto Canada associated with the Sanbo Zen lineage of practice. Students in the group have worked with a combination of teachers; Elaine MacInnes, Nenates Albert, Roselyn Stone, Dragan Petrovic, Brian Chisholm, Patrick Gallagher and Valerie Forstman. We are a private zendo, but inquiries can be made by email to torontozendowest@gmail.com.",
+      },
+      ownerUser.id
+    );
+
+    // 1 Tuesday sit (next Tuesday from now)
+    function getNextTuesday(date: Date): Date {
+      const d = new Date(date);
+      d.setHours(0, 0, 0, 0);
+      const day = d.getDay();
+      const daysUntilTuesday = (2 - day + 7) % 7 || 7;
+      d.setDate(d.getDate() + daysUntilTuesday);
+      return d;
+    }
+    const nextTuesday = getNextTuesday(now);
+    for (let i = 0; i < 2; i++) {
+      const sitDate = new Date(nextTuesday);
+      sitDate.setDate(sitDate.getDate() + i * 7);
+      const sitStart = new Date(sitDate);
+      sitStart.setHours(18, 0, 0, 0); // 6pm
+      const sitEnd = new Date(sitDate);
+      sitEnd.setHours(20, 0, 0, 0); // 8pm
+      const zazenEvent = await calendarEventsService.createCalendarEvent(
+        {
+          title: "Weekly Zazen Sit",
+          desc: "Regular Tuesday evening zazen with visiting teacher Stan Krzyzanowski.",
+          location: "Toronto Zendo West",
+          startDt: sitStart,
+          endDt: sitEnd,
+          communityId: torontoZendo.id,
+        },
+        ownerUser.id
+      );
+      await calendarEventsService.publishCalendarEvent(
+        zazenEvent.id,
+        ownerUser.id
+      );
+    }
+
+    // Mini-sesshin: Fri July 26th 12pm to Sun July 28th 6pm at The Lakehouse
+    const sesshinStart = new Date(now.getFullYear(), 6, 26, 12, 0, 0, 0); // July is 6 (0-based)
+    const sesshinEnd = new Date(now.getFullYear(), 6, 28, 18, 0, 0, 0); // July 28th 6pm
+    const sesshinEvent = await calendarEventsService.createCalendarEvent(
+      {
+        title: "Mini-Sesshin with Stan Krzyzanowski",
+        desc: "A weekend mini-sesshin led by Stan Krzyzanowski at The Lakehouse.",
+        location: "The Lakehouse",
+        startDt: sesshinStart,
+        endDt: sesshinEnd,
+        communityId: torontoZendo.id,
+      },
+      ownerUser.id
+    );
+    await calendarEventsService.publishCalendarEvent(
+      sesshinEvent.id,
+      ownerUser.id
+    );
+
+    // Add dummy calendar events for each community
     for (const community of createdCommunities) {
       // Event 1: Future event
       await calendarEventsService.createCalendarEvent(
