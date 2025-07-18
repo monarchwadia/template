@@ -2,16 +2,9 @@ import { router, publicProcedure, protectedProcedure } from "../server/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { Dependencies } from "../provideDependencies.types";
-import { AuthorizationUtils } from "../utils/AuthorizationUtils";
 
 export const buildCalendarEventsRouter = (deps: Dependencies) => {
-  const { calendarEventsService } = deps;
-  const authUtils = new AuthorizationUtils(deps.prisma);
-
-  // Helper function to check if user has access to a community
-  const checkCommunityAccess = async (userId: string, communityId: string) => {
-    return authUtils.checkCommunityAccess(userId, communityId);
-  };
+  const { calendarEventsService, authorizationUtils } = deps;
 
   const calendarEventsRouter = router({
     // Create a calendar event (community owners only)
@@ -64,15 +57,16 @@ export const buildCalendarEventsRouter = (deps: Dependencies) => {
     view: protectedProcedure
       .input(z.object({ eventId: z.string().uuid() }))
       .query(async ({ input, ctx }) => {
-        const event = await calendarEventsService.viewCalendarEvent(
+        const event = await calendarEventsService.getCalendarEvent(
           input.eventId
         );
 
         // Check if user has access to this community
-        const { isOwner, isMember } = await checkCommunityAccess(
-          ctx.userId,
-          event.communityId
-        );
+        const { isOwner, isMember } =
+          await authorizationUtils.checkCommunityAccess(
+            ctx.userId,
+            event.communityId
+          );
 
         if (!isOwner && !isMember) {
           throw new TRPCError({
@@ -181,10 +175,11 @@ export const buildCalendarEventsRouter = (deps: Dependencies) => {
         }
 
         // Check if user has access to this community
-        const { isOwner, isMember } = await checkCommunityAccess(
-          ctx.userId,
-          community.id
-        );
+        const { isOwner, isMember } =
+          await authorizationUtils.checkCommunityAccess(
+            ctx.userId,
+            community.id
+          );
 
         if (!isOwner && !isMember) {
           throw new TRPCError({

@@ -8,6 +8,7 @@ import { CommunityService } from "./service/CommunityService";
 import { CalendarEventsService } from "./service/CalendarEventsService";
 import { EmailService } from "./service/EmailService";
 import { getAppConfig } from "./utils/getAppConfig";
+import { AuthorizationUtils } from "./utils/AuthorizationUtils";
 
 let instance: Dependencies | null = null;
 
@@ -26,6 +27,7 @@ export const provideDependencies = (): Dependencies => {
       forcePathStyle: !!appConfig.s3Endpoint, // Required for local S3 services like LocalStack or Min
     });
     const emailService = new EmailService(prisma);
+    const authorizationUtils = new AuthorizationUtils(prisma);
     instance = {
       userService: new UserService(prisma, jwtService),
       fileManagementService: new FileManagementService(
@@ -33,9 +35,10 @@ export const provideDependencies = (): Dependencies => {
         s3,
         appConfig.s3Bucket
       ),
-      communityService: new CommunityService(prisma),
+      communityService: new CommunityService(prisma, authorizationUtils),
       calendarEventsService: new CalendarEventsService(prisma, emailService),
       emailService: emailService,
+      authorizationUtils: authorizationUtils,
       prisma: prisma,
     };
   }

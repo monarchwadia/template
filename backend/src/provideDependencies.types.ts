@@ -4,6 +4,7 @@ import { UserService } from "./service/UserService";
 import { CommunityService } from "./service/CommunityService";
 import { CalendarEventsService } from "./service/CalendarEventsService";
 import { EmailService } from "./service/EmailService";
+import { AuthorizationUtils } from "./utils/AuthorizationUtils";
 
 export interface Dependencies {
   userService: UserService;
@@ -11,5 +12,6 @@ export interface Dependencies {
   communityService: CommunityService;
   calendarEventsService: CalendarEventsService;
   emailService: EmailService;
+  authorizationUtils: AuthorizationUtils;
   prisma: PrismaClient;
 }

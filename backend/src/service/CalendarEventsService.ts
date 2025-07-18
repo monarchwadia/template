@@ -78,7 +78,7 @@ export class CalendarEventsService {
     });
   }
 
-  async viewCalendarEvent(eventId: string) {
+  async getCalendarEvent(eventId: string) {
     const event = await this.prisma.calendarEvent.findUnique({
       where: { id: eventId },
       include: {

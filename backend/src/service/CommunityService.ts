@@ -1,8 +1,12 @@
 import { PrismaClient } from "../../prisma/generated/prisma";
 import { TRPCError } from "@trpc/server";
+import { AuthorizationUtils } from "../utils/AuthorizationUtils";
 
 export class CommunityService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(
+    private readonly prisma: PrismaClient,
+    private authUtils: AuthorizationUtils
+  ) {}
 
   private readonly communityPublicSelect = {
     id: true,
@@ -19,13 +23,14 @@ export class CommunityService {
     const community = await this.prisma.community.findUnique({
       where: { slug },
     });
-    if (!community)
+    if (!community) {
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "Community not found",
       });
-    if (community.ownerId !== userId)
-      throw new TRPCError({ code: "FORBIDDEN", message: "Not authorized" });
+    }
+    // Use AuthorizationUtils to check owner
+    await this.authUtils.requireCommunityOwner(userId, community.id);
     return community;
   }
 
