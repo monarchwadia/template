@@ -2,9 +2,17 @@ import { router, publicProcedure, protectedProcedure } from "../server/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { Dependencies } from "../provideDependencies.types";
+import { AuthorizationUtils } from "../utils/AuthorizationUtils";
 
 export const buildCalendarEventsRouter = (deps: Dependencies) => {
   const { calendarEventsService } = deps;
+  const authUtils = new AuthorizationUtils(deps.prisma);
+
+  // Helper function to check if user has access to a community
+  const checkCommunityAccess = async (userId: string, communityId: string) => {
+    return authUtils.checkCommunityAccess(userId, communityId);
+  };
+
   const calendarEventsRouter = router({
     // Create a calendar event (community owners only)
     create: protectedProcedure
@@ -53,13 +61,35 @@ export const buildCalendarEventsRouter = (deps: Dependencies) => {
       }),
 
     // View a calendar event (published events for everyone, unpublished for owners)
-    view: publicProcedure
+    view: protectedProcedure
       .input(z.object({ eventId: z.string().uuid() }))
       .query(async ({ input, ctx }) => {
-        return calendarEventsService.viewCalendarEvent(
-          input.eventId,
-          ctx.userId ?? undefined
+        const event = await calendarEventsService.viewCalendarEvent(
+          input.eventId
         );
+
+        // Check if user has access to this community
+        const { isOwner, isMember } = await checkCommunityAccess(
+          ctx.userId,
+          event.communityId
+        );
+
+        if (!isOwner && !isMember) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You must be a member of the community to view this event",
+          });
+        }
+
+        // If event is not published, only community owner can view it
+        if (!event.publishedAt && !isOwner) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Event is not published",
+          });
+        }
+
+        return event;
       }),
 
     // Update a calendar event (community owners only)
@@ -131,7 +161,7 @@ export const buildCalendarEventsRouter = (deps: Dependencies) => {
       }),
 
     // List calendar events (published for everyone, all for owners)
-    list: publicProcedure
+    list: protectedProcedure
       .input(
         z.object({
           slug: z.string().min(1),
@@ -149,9 +179,26 @@ export const buildCalendarEventsRouter = (deps: Dependencies) => {
             message: "Community not found",
           });
         }
+
+        // Check if user has access to this community
+        const { isOwner, isMember } = await checkCommunityAccess(
+          ctx.userId,
+          community.id
+        );
+
+        if (!isOwner && !isMember) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You must be a member of the community to view its events",
+          });
+        }
+
+        // Owners can see all events (including unpublished), members only see published
+        const showUnpublished = isOwner;
+
         return calendarEventsService.listCalendarEvents(
           community.id,
-          ctx.userId ?? undefined
+          showUnpublished
         );
       }),
   });

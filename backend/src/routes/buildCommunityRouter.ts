@@ -2,9 +2,11 @@ import { router, publicProcedure, protectedProcedure } from "../server/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { Dependencies } from "../provideDependencies.types";
+import { AuthorizationUtils } from "../utils/AuthorizationUtils";
 
 export const buildCommunityRouter = (deps: Dependencies) => {
   const { communityService } = deps;
+  const authUtils = new AuthorizationUtils(deps.prisma);
   const communityRouter = router({
     // Create a community (anyone)
     create: publicProcedure
