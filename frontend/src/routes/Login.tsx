@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { trpcClient } from "../clients/trpcClient";
-import { useQueryClient } from "@tanstack/react-query";
 import { AuthUtils } from "../utils/auth.utils";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -9,7 +8,6 @@ import { GuardMustBeLoggedOut } from "../guards/GuardMustBeLoggedOut";
 import { invalidateUserProfile } from "../hooks/useUserProfile";
 
 export default function Login() {
-  const tanstackQueryClient = useQueryClient();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
