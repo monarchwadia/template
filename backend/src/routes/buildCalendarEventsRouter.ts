@@ -134,12 +134,23 @@ export const buildCalendarEventsRouter = (deps: Dependencies) => {
     list: publicProcedure
       .input(
         z.object({
-          communityId: z.string().uuid().optional(),
+          slug: z.string().min(1),
         })
       )
       .query(async ({ input, ctx }) => {
+        // Look up community by slug
+        const community = await deps.prisma.community.findUnique({
+          where: { slug: input.slug },
+          select: { id: true },
+        });
+        if (!community) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Community not found",
+          });
+        }
         return calendarEventsService.listCalendarEvents(
-          input.communityId,
+          community.id,
           ctx.userId ?? undefined
         );
       }),
