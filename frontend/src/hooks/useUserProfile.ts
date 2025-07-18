@@ -1,11 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
-import { trpcClient } from '../clients/trpcClient';
-import { AuthUtils } from '../utils/auth.utils';
-import { queryClient } from '../clients/reactQueryClient';
+import { useQuery } from "@tanstack/react-query";
+import { trpcClient } from "../clients/trpcClient";
+import { AuthUtils } from "../utils/auth.utils";
+import { queryClient } from "../clients/reactQueryClient";
 
 const keys = {
-  userProfile: ['user-profile'],
-}
+  userProfile: ["user-profile"],
+};
 
 export function useUserProfile() {
   const userQueryResult = useQuery({
@@ -23,6 +23,6 @@ export function useUserProfile() {
   return userQueryResult;
 }
 
-export const invalidateUserProfile = () => {
-  queryClient.invalidateQueries({ queryKey: keys.userProfile });
-}
+export const invalidateUserProfile = async () => {
+  await queryClient.invalidateQueries({ queryKey: keys.userProfile });
+};
