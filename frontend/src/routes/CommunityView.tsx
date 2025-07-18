@@ -1,6 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useCommunity } from "../hooks/useCommunityPublic";
 import { CommunityEventsList } from "../components/CommunityEventsList";
+import { ConfirmModal } from "../components/ConfirmModal";
 import { useJoinCommunity } from "../hooks/useJoinCommunity";
 import { useLeaveCommunity } from "../hooks/useLeaveCommunity";
 import { HiUserGroup, HiUserCircle, HiStar } from "react-icons/hi2";
@@ -12,6 +14,7 @@ export default function CommunityView() {
   const { data, isLoading, error } = useCommunity(slug);
   const joinMutation = useJoinCommunity();
   const leaveMutation = useLeaveCommunity();
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
 
   let statusIcon = (
     <HiUserGroup
@@ -94,15 +97,32 @@ export default function CommunityView() {
                 {/* Join/Leave Button */}
                 {!data.isOwner &&
                   (data.isMember ? (
-                    <button
-                      className="btn btn-outline btn-error btn-sm"
-                      onClick={() => leaveMutation.mutate(slug!)}
-                      disabled={leaveMutation.isPending}
-                    >
-                      {leaveMutation.isPending
-                        ? "Leaving..."
-                        : "Leave Community"}
-                    </button>
+                    <>
+                      <button
+                        className="btn btn-outline btn-error btn-sm"
+                        onClick={() => setShowLeaveModal(true)}
+                        disabled={leaveMutation.isPending}
+                      >
+                        {leaveMutation.isPending
+                          ? "Leaving..."
+                          : "Leave Community"}
+                      </button>
+                      <ConfirmModal
+                        open={showLeaveModal}
+                        title="Leave Community?"
+                        message="Are you sure you want to leave this community?"
+                        confirmText={
+                          leaveMutation.isPending ? "Leaving..." : "Yes, Leave"
+                        }
+                        cancelText="Cancel"
+                        onConfirm={() => {
+                          setShowLeaveModal(false);
+                          leaveMutation.mutate(slug!);
+                        }}
+                        onCancel={() => setShowLeaveModal(false)}
+                        confirmLoading={leaveMutation.isPending}
+                      />
+                    </>
                   ) : (
                     <button
                       className="btn btn-primary btn-sm"
