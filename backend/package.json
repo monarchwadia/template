@@ -9,7 +9,7 @@
     "dev": "tsx --watch src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed": "tsx prisma/seed.ts",
-    "job:email": "tsx src/jobs/emailJob.ts"
+    "job:emailProcessor": "tsx src/jobs/emailProcessorJob.ts"
   },
   "keywords": [],
   "author": "",

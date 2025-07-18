@@ -50,4 +50,25 @@ export class EmailService {
       )
     );
   }
+
+  async sendGenericEmail(
+    to: string[],
+    subject: string,
+    body: string
+  ): Promise<void> {
+    const results = await Promise.allSettled(
+      to.map((recipient) =>
+        this.prisma.emailOutbox.create({
+          data: { to: recipient, subject, body },
+        })
+      )
+    );
+
+    // Log any failures
+    results
+      .filter((result) => result.status === "rejected")
+      .forEach((result) => {
+        console.error("Failed to queue email:", result.reason);
+      });
+  }
 }
