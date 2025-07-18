@@ -93,11 +93,37 @@ export class CalendarEventsService {
       });
     }
 
-    // If event is not published, only community owner can view it
-    if (!event.publishedAt && event.community.ownerId !== userId) {
+    // Check if user is a member of the community or the owner
+    if (userId) {
+      const isOwner = event.community.ownerId === userId;
+      const isMember = await this.prisma.userCommunity.findUnique({
+        where: {
+          userId_communityId: {
+            userId: userId,
+            communityId: event.communityId,
+          },
+        },
+      });
+
+      if (!isOwner && !isMember) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You must be a member of the community to view this event",
+        });
+      }
+
+      // If event is not published, only community owner can view it
+      if (!event.publishedAt && !isOwner) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Event is not published",
+        });
+      }
+    } else {
+      // Not logged in - cannot view any events
       throw new TRPCError({
         code: "FORBIDDEN",
-        message: "Event is not published",
+        message: "You must be logged in to view events",
       });
     }
 
