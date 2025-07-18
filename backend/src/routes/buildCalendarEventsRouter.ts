@@ -18,7 +18,7 @@ export const buildCalendarEventsRouter = (deps: Dependencies) => {
           endDt: z.string().datetime(),
           timezone: z.string().optional(),
           slug: z.string(),
-          publish: z.boolean().optional(),
+          publish: z.boolean(),
         })
       )
       .mutation(async ({ input, ctx }) => {
@@ -97,6 +97,7 @@ export const buildCalendarEventsRouter = (deps: Dependencies) => {
           startDt: z.string().datetime().optional(),
           endDt: z.string().datetime().optional(),
           timezone: z.string().optional(),
+          publish: z.boolean().optional(),
         })
       )
       .mutation(async ({ input, ctx }) => {
@@ -109,6 +110,7 @@ export const buildCalendarEventsRouter = (deps: Dependencies) => {
             startDt: input.startDt ? new Date(input.startDt) : undefined,
             endDt: input.endDt ? new Date(input.endDt) : undefined,
             timezone: input.timezone,
+            publish: input.publish,
           },
           ctx.userId
         );

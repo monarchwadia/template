@@ -60,7 +60,6 @@ export const EditEventForm: React.FC<EditEventFormProps> = ({
         }
         onCancel={onCancel}
         cancelLabel="Cancel"
-        showPublishToggle={true}
       />
       {updateMutation.isSuccess && (
         <div className="alert alert-success mt-4">

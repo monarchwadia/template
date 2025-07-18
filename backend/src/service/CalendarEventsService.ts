@@ -105,6 +105,7 @@ export class CalendarEventsService {
       startDt?: Date;
       endDt?: Date;
       timezone?: string;
+      publish?: boolean;
     },
     userId: string
   ) {
@@ -133,6 +134,10 @@ export class CalendarEventsService {
       });
     }
 
+    // if the existing event does not have a published date but the new data does, we consider it as just published
+    const wasJustPublished = !event.publishedAt && data.publish;
+    const publishedAt = wasJustPublished ? new Date() : event.publishedAt;
+
     const updatedEvent = await this.prisma.calendarEvent.update({
       where: { id: eventId },
       data: {
@@ -142,23 +147,12 @@ export class CalendarEventsService {
         startDt: startDt,
         endDt: endDt,
         timezone: data.timezone ?? event.timezone,
+        publishedAt,
       },
       include: {
         community: true,
       },
     });
-
-    // Send update notification to community members if event is published
-    if (event.publishedAt) {
-      const memberEmails = await this.getCommunityMemberEmails(
-        event.communityId
-      );
-      await this.emailService.sendEventUpdatedEmail(
-        eventId,
-        updatedEvent.title,
-        memberEmails
-      );
-    }
 
     return updatedEvent;
   }
@@ -250,14 +244,6 @@ export class CalendarEventsService {
         community: true,
       },
     });
-
-    // Send published notification to community members
-    const memberEmails = await this.getCommunityMemberEmails(event.communityId);
-    await this.emailService.sendEventPublishedEmail(
-      eventId,
-      publishedEvent.title,
-      memberEmails
-    );
 
     return publishedEvent;
   }

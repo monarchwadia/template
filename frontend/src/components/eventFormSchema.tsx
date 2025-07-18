@@ -7,5 +7,5 @@ export const eventFormSchema = z.object({
   startDt: z.string().min(1, "Start date/time is required"),
   endDt: z.string().min(1, "End date/time is required"),
   timezone: z.string().min(1, "Timezone is required"),
-  publish: z.boolean().optional(),
+  publish: z.boolean(),
 });

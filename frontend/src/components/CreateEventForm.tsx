@@ -26,16 +26,9 @@ export const CreateEventForm = () => {
       return;
     }
     try {
-      const toIso = (val: string) => {
-        const date = new Date(val);
-        return date.toISOString();
-      };
       await createEventMutation.mutateAsync({
         slug,
         ...data,
-        startDt: toIso(data.startDt),
-        endDt: toIso(data.endDt),
-        publish: !!data.publish,
       });
       navigate(`/c/${slug}`);
     } catch (err: unknown) {
@@ -55,7 +48,6 @@ export const CreateEventForm = () => {
       submitLabel="Create Event"
       isSubmitting={createEventMutation.isPending}
       submitError={submitError}
-      showPublishToggle={true}
     />
   );
 };

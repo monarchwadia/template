@@ -10,7 +10,7 @@ export interface EventFormFields {
   startDt: string;
   endDt: string;
   timezone: string;
-  publish?: boolean;
+  publish: boolean;
 }
 
 interface EventFormProps {
@@ -19,7 +19,6 @@ interface EventFormProps {
   submitLabel: string;
   isSubmitting?: boolean;
   submitError?: string | null;
-  showPublishToggle?: boolean;
   onCancel?: () => void;
   cancelLabel?: string;
 }
@@ -30,7 +29,6 @@ export const EventForm: React.FC<EventFormProps> = ({
   submitLabel,
   isSubmitting,
   submitError,
-  showPublishToggle = false,
   onCancel,
   cancelLabel = "Cancel",
 }) => {
@@ -61,8 +59,18 @@ export const EventForm: React.FC<EventFormProps> = ({
     setValue("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
   };
 
+  // Convert startDt and endDt to ISO string before submit
+  const handleFormSubmit = (data: EventFormFields) => {
+    const toIso = (val: string) => new Date(val).toISOString();
+    onSubmit({
+      ...data,
+      startDt: toIso(data.startDt),
+      endDt: toIso(data.endDt),
+    });
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
       <div>
         <label className="label">
           <span className="label-text">Title</span>
@@ -158,19 +166,17 @@ export const EventForm: React.FC<EventFormProps> = ({
           </span>
         )}
       </div>
-      {showPublishToggle && (
-        <div className="form-control">
-          <label className="label cursor-pointer justify-start gap-4">
-            <input
-              type="checkbox"
-              className="toggle toggle-primary"
-              {...register("publish")}
-              defaultChecked={initialValues.publish ?? true}
-            />
-            <span className="label-text">Publish Event</span>
-          </label>
-        </div>
-      )}
+      <div className="form-control">
+        <label className="label cursor-pointer justify-start gap-4">
+          <input
+            type="checkbox"
+            className="toggle toggle-primary"
+            {...register("publish")}
+            defaultChecked={initialValues.publish ?? true}
+          />
+          <span className="label-text">Publish Event</span>
+        </label>
+      </div>
       {submitError && (
         <div className="alert alert-error mt-2">{submitError}</div>
       )}
