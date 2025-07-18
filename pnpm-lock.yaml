@@ -41,6 +41,9 @@ importers:
       nodemailer:
         specifier: ^7.0.5
         version: 7.0.5
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
       zod:
         specifier: ^4.0.5
         version: 4.0.5
@@ -87,6 +90,9 @@ importers:
       daisyui:
         specifier: ^5.0.46
         version: 5.0.46
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
       react:
         specifier: ^19.1.0
         version: 19.1.0
@@ -1965,6 +1971,11 @@ packages:
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
+
+  prettier@3.6.2:
+    resolution: {integrity: sha512-I7AIg5boAr5R0FFtJ6rCfD+LFsWHp81dolrFD8S79U9tb8Az2nGrJncnMSnys+bpQJfRUzqs9hnA81OAA3hCuQ==}
+    engines: {node: '>=14'}
+    hasBin: true
 
   prisma@6.11.1:
     resolution: {integrity: sha512-VzJToRlV0s9Vu2bfqHiRJw73hZNCG/AyJeX+kopbu4GATTjTUdEWUteO3p4BLYoHpMS4o8pD3v6tF44BHNZI1w==}
@@ -4481,6 +4492,8 @@ snapshots:
       source-map-js: 1.2.1
 
   prelude-ls@1.2.1: {}
+
+  prettier@3.6.2: {}
 
   prisma@6.11.1(typescript@5.8.3):
     dependencies:

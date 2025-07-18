@@ -1,19 +1,18 @@
 // import { db } from "./db";
 import { buildRootRouter } from "../routes/buildRootRouter";
-import express from 'express';
-import { createExpressMiddleware } from '@trpc/server/adapters/express';
-import { createContext } from './context';
+import express from "express";
+import { createExpressMiddleware } from "@trpc/server/adapters/express";
+import { createContext } from "./context";
 import { Dependencies } from "../provideDependencies.types";
 
 export const buildServer = (deps: Dependencies) => {
   const app = express();
   app.use(
-    '/trpc',
+    "/trpc",
     createExpressMiddleware({
       router: buildRootRouter(deps),
       createContext,
     })
   );
   return app;
-}
-
+};

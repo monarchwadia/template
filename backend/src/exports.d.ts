@@ -1,1 +1,1 @@
-export {AppRouter} from "./routes/buildRootRouter";
+export { AppRouter } from "./routes/buildRootRouter";

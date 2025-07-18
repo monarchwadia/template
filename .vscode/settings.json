@@ -1,5 +1,7 @@
 {
   "files.exclude": {
     "backend/prisma/generated": true
-  }
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

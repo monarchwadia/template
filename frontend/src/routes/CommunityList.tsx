@@ -5,7 +5,7 @@ export default function CommunityList() {
   const { data, isLoading, error } = useCommunityList();
 
   return (
-    <div className="container mx-auto py-8">
+     <div className="container mx-auto py-8">
       <h1 className="text-2xl font-bold mb-4">Communities</h1>
       {isLoading && <div className="loading loading-spinner loading-md" />}
       {error && <div className="alert alert-error">Error loading communities.</div>}

@@ -6,10 +6,10 @@ import { CalendarEventsService } from "./service/CalendarEventsService";
 import { EmailService } from "./service/EmailService";
 
 export interface Dependencies {
-    userService: UserService;
-    fileManagementService: FileManagementService;
-    communityService: CommunityService;
-    calendarEventsService: CalendarEventsService;
-    emailService: EmailService;
-    prisma: PrismaClient;
+  userService: UserService;
+  fileManagementService: FileManagementService;
+  communityService: CommunityService;
+  calendarEventsService: CalendarEventsService;
+  emailService: EmailService;
+  prisma: PrismaClient;
 }

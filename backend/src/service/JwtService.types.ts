@@ -1,4 +1,4 @@
 export interface UserSessionContents {
-    userId: string;
-    email: string;
+  userId: string;
+  email: string;
 }

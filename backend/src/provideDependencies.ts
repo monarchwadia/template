@@ -28,11 +28,15 @@ export const provideDependencies = (): Dependencies => {
     const emailService = new EmailService(prisma);
     instance = {
       userService: new UserService(prisma, jwtService),
-      fileManagementService: new FileManagementService(prisma, s3, appConfig.s3Bucket),
+      fileManagementService: new FileManagementService(
+        prisma,
+        s3,
+        appConfig.s3Bucket
+      ),
       communityService: new CommunityService(prisma),
       calendarEventsService: new CalendarEventsService(prisma, emailService),
       emailService: emailService,
-      prisma: prisma
+      prisma: prisma,
     };
   }
 
