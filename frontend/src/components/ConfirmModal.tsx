@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 
 interface ConfirmModalProps {
   open: boolean;
@@ -22,7 +23,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   confirmLoading = false,
 }) => {
   if (!open) return null;
-  return (
+  return createPortal(
     <dialog className="modal modal-open">
       <div className="modal-box">
         <h3 className="font-bold text-lg">{title}</h3>
@@ -40,6 +41,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
           </button>
         </div>
       </div>
-    </dialog>
+    </dialog>,
+    document.body
   );
 };
