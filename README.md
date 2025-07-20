@@ -14,7 +14,6 @@ This file also uses `coolproject` as a placeholder.
 docker run --name coolproject-postgres -e POSTGRES_USER=coolproject-postgres -e POSTGRES_PASSWORD=coolproject-postgres -e POSTGRES_DB=coolproject-postgres -e POSTGRES_HOST_AUTH_METHOD=md5  -v coolproject-postgres:/var/lib/postgresql/data -p 6432:5432 -d postgres:latest
 ```
 
-
 ## Connect From Another Docker Instance on the Host Network
 
 Then, you can connect to it on its host network. You can find this by going to the container in Docker Desktop, clicking on the "Network" tab and getting the "Gateway" value. I found it set to `172.17.0.1` so I sent my `DATABASE_URL` to `postgresql://coolproject-postgres:coolproject-postgres@172.17.0.1:6432/coolproject-postgres?schema=public`
@@ -37,7 +36,7 @@ PGPASSWORD=coolproject-postgres psql -h 127.0.0.1 -p 6432 -U coolproject-postgre
 
 ## File Management API
 
-We are using S3-compatible APIs for file management. 
+We are using S3-compatible APIs for file management.
 
 For local development, you can run the minio docker image, then create a bucket
 
@@ -50,8 +49,6 @@ uv venv
 source .venv/bin/activate
 uv pip install awscli --upgrade
 ```
-
-
 
 ### Step 1
 
@@ -76,10 +73,11 @@ aws configure
 ```
 
 # Then set the following values
-* `AWS Access Key ID`: coolproject-localstack
-* `AWS Secret Access Key`: coolproject-localstack
-* `Default region name`: us-east-1
-* `Default output format`: json
+
+- `AWS Access Key ID`: coolproject-localstack
+- `AWS Secret Access Key`: coolproject-localstack
+- `Default region name`: us-east-1
+- `Default output format`: json
 
 ### Step 2 - Create bucket
 
@@ -101,3 +99,7 @@ aws --endpoint-url=http://localhost:4566 \
   --bucket coolproject-localstack \
   --cors-configuration file://localstack/cors.json
 ```
+
+# Terraform
+
+Install terraform https://developer.hashicorp.com/terraform/install
