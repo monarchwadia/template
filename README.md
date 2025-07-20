@@ -34,13 +34,13 @@ Set `DATABASE_URL` to `postgresql://coolproject-postgres:coolproject-postgres@12
 PGPASSWORD=coolproject-postgres psql -h 127.0.0.1 -p 6432 -U coolproject-postgres -d coolproject-postgres
 ```
 
-## File Management API
+# File Management API
 
 We are using S3-compatible APIs for file management.
 
 For local development, you can run the minio docker image, then create a bucket
 
-### Step 0
+## Step 0
 
 Initialize python3. For example, with uv
 
@@ -50,7 +50,7 @@ source .venv/bin/activate
 uv pip install awscli --upgrade
 ```
 
-### Step 1
+## Step 1
 
 ```bash
 docker run -d -it \
@@ -79,7 +79,7 @@ aws configure
 - `Default region name`: us-east-1
 - `Default output format`: json
 
-### Step 2 - Create bucket
+## Step 2 - Create bucket
 
 ```bash
 aws --endpoint-url=http://localhost:4566 \
@@ -88,7 +88,7 @@ aws --endpoint-url=http://localhost:4566 \
     --region us-east-1
 ```
 
-### Step 3 - configure cors
+## Step 3 - configure cors
 
 There is a file called `localstack/cors.json` that will let you set the cors configuration for the bucket.
 
@@ -99,6 +99,25 @@ aws --endpoint-url=http://localhost:4566 \
   --bucket coolproject-localstack \
   --cors-configuration file://localstack/cors.json
 ```
+
+## Keycloak
+
+### Step 1
+
+Run the docker container
+
+Takes about 30 seconds for it to be available on localhost:6789
+
+```bash
+docker run -d -p 127.0.0.1:6789:8080 \
+-e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
+-e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+--name coolproject-keycloak \
+quay.io/keycloak/keycloak:26.3.1 \
+start-dev
+```
+
+# Deployment
 
 # Terraform
 
