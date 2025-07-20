@@ -102,9 +102,9 @@ aws --endpoint-url=http://localhost:4566 \
 
 ## Keycloak
 
-### Step 1
+(Running off https://www.keycloak.org/getting-started/getting-started-docker)
 
-Run the docker container
+Run the docker container with the following command
 
 Takes about 30 seconds for it to be available on localhost:6789
 
@@ -115,6 +115,34 @@ docker run -d -p 127.0.0.1:6789:8080 \
 --name coolproject-keycloak \
 quay.io/keycloak/keycloak:26.3.1 \
 start-dev
+```
+
+After 30s, visit http://localhost:6789 and log in with `admin/admin` (configured in the bash command above)
+
+Then create realm and user
+
+- Open the Keycloak Admin Console.
+- Click Create Realm next to Current realm.
+- Enter `coolproject-keycloak-saas` in the Realm name field.
+- Click Create.
+
+- Click Manage -> Users
+- Create the following users manually
+
+```
+# admin
+username:         admin
+email:            admin@admin.com
+firstname:        admin
+lastname:         admin
+email verified:   true
+
+# normal
+username:         user
+email:            user@user.com
+firstname:        user
+lastname:         user
+email verified:   true
 ```
 
 # Deployment
