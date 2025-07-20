@@ -109,12 +109,15 @@ Run the docker container with the following command
 Takes about 30 seconds for it to be available on localhost:6789
 
 ```bash
+# Note: this runs as --user 0, NOT RECOMMENDED FOR PRODUCTION.
 docker run -d -p 127.0.0.1:6789:8080 \
--e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
--e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
---name coolproject-keycloak \
-quay.io/keycloak/keycloak:26.3.1 \
-start-dev
+  -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
+  -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+  --user 0 \
+  --name coolproject-keycloak \
+  -v coolproject-keycloak:/opt/keycloak/data/h2 \
+  quay.io/keycloak/keycloak:26.3.1 \
+  start-dev
 ```
 
 After 30s, visit http://localhost:6789 and log in with `admin/admin` (configured in the bash command above)
@@ -123,7 +126,7 @@ Then create realm and user
 
 - Open the Keycloak Admin Console.
 - Click Create Realm next to Current realm.
-- Enter `coolproject-keycloak-saas` in the Realm name field.
+- Enter `coolproject` in the Realm name field.
 - Click Create.
 
 - Click Manage -> Users
@@ -144,6 +147,10 @@ firstname:        user
 lastname:         user
 email verified:   true
 ```
+
+For each, also go to the "User -> Credentials" tab and set a new password, with 'temporary' set to false
+
+Check that you can log in at `http://localhost:6789/realms/coolproject/account`
 
 # Deployment
 
