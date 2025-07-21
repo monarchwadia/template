@@ -56,6 +56,20 @@ export const UserProfileIndicator = () => {
     );
   }
 
+  let avatarContent: string = "";
+  let displayName: string = "";
+  if (userProfile.name) {
+    avatarContent = userProfile.name.charAt(0).toUpperCase();
+    displayName = userProfile.name;
+  } else if (userProfile.email) {
+    avatarContent = userProfile.email.charAt(0).toUpperCase();
+    displayName = userProfile.email;
+  } else {
+    // Fallback if no name or email is available
+    avatarContent = "?";
+    displayName = "Unknown User";
+  }
+
   return (
     <div className="space-y-3">
       {/* User Info Card */}
@@ -68,16 +82,16 @@ export const UserProfileIndicator = () => {
           <div className="avatar avatar-placeholder">
             <div className="bg-neutral text-neutral-content w-9 rounded-full flex items-center justify-center">
               <span className="text-md font-bold">
-                {userProfile.email.charAt(0).toUpperCase()}
+                {avatarContent.toUpperCase()}
               </span>
             </div>
           </div>
           <div className="flex-1 min-w-0">
             <p
               className="text-sm font-medium text-base-content truncate"
-              title={userProfile.email}
+              title={displayName}
             >
-              {userProfile.email}
+              {displayName}
             </p>
           </div>
         </div>

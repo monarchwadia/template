@@ -14,6 +14,7 @@ export const buildAuthRouter = (deps: Dependencies) => {
         select: {
           id: true,
           email: true,
+          name: true,
           ownedCommunities: {
             select: {
               id: true,
@@ -48,19 +49,12 @@ export const buildAuthRouter = (deps: Dependencies) => {
       return {
         id: user.id,
         email: user.email,
+        name: user.name,
         ownedCommunities: user.ownedCommunities,
         joinedCommunities,
       };
     }),
 
-    /*
-     *
-     *
-     *
-     * The new authentication flow using OIDC goes past this line.
-     *
-     *
-     */
     ensureUserProfile: publicProcedure
       .input(
         z.object({
