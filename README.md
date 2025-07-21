@@ -129,6 +129,10 @@ Then create realm and user
 - Click Create Realm next to Current realm.
 - Enter `coolproject` in the Realm name field.
 - Click Create.
+- Click "Realm Settings" -> Login
+- Turn on User Registration
+- Turn on Forgot Password
+- Turn on Edit Username
 
 - Click Manage -> Users
 - Create the following users manually
