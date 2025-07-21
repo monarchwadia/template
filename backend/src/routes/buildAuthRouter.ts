@@ -104,6 +104,16 @@ export const buildAuthRouter = (deps: Dependencies) => {
         joinedCommunities,
       };
     }),
+
+    /*
+     *
+     *
+     *
+     * The new authentication flow using OIDC goes past this line.
+     *
+     *
+     */
+    getOwnProfile: publicProcedure.query(async ({ ctx }) => {}),
   });
   return authRouter;
 };
