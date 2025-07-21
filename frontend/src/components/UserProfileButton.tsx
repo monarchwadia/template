@@ -4,6 +4,7 @@ import { invalidateUserProfile, useUserProfile } from "../hooks/useUserProfile";
 import { AuthUtils } from "../utils/auth.utils";
 import { MdError, MdLogout } from "react-icons/md";
 import { ConfirmModal } from "./ConfirmModal";
+import { beginLogin } from "../oidc/Oidc";
 
 export const UserProfileIndicator = () => {
   const nav = useNavigate();
@@ -46,7 +47,7 @@ export const UserProfileIndicator = () => {
         <div className="mt-2 space-y-1">
           <button
             className="btn btn-primary btn-sm w-full"
-            onClick={() => nav("/login")}
+            onClick={() => beginLogin()}
           >
             Sign In
           </button>

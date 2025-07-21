@@ -110,6 +110,7 @@ Takes about 30 seconds for it to be available on localhost:6789
 
 ```bash
 # Note: this runs as --user 0, NOT RECOMMENDED FOR PRODUCTION.
+# first cd into the ./keycloak folder in this project
 docker run -d -p 127.0.0.1:6789:8080 \
   -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
   -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
@@ -150,7 +151,19 @@ email verified:   true
 
 For each, also go to the "User -> Credentials" tab and set a new password, with 'temporary' set to false
 
-Check that you can log in at `http://localhost:6789/realms/coolproject/account`
+(At this point, if you would like, check that you can log in at `http://localhost:6789/realms/coolproject/account` with the users.)
+
+Then, still in the main admin console...
+
+- click on "Clients" -> Create Client
+- clientId = `coolproject-app`
+- click next... "Standard Flow" should be checked
+- click next
+  - Valid redirect URIs should be `http://localhost:5173/auth/callback`
+  - Web origins should be `http://localhost:5173`
+- click save
+
+Now you should be able to click the 'login' button to get redirected
 
 # Deployment
 
