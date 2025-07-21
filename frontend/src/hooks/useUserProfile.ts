@@ -19,12 +19,13 @@ export function useUserProfile() {
 
       // new oidc logic
       try {
-        const oidcTokenEndpointResponse = localStorage.getItem(
-          "oidc_token_endpoint_response"
-        );
-        if (!oidcTokenEndpointResponse) return null;
-        const tokenData = JSON.parse(oidcTokenEndpointResponse);
-        if (!tokenData || !tokenData.access_token) return null;
+        const oidcTokenEndpointResponse =
+          AuthUtils.getOidcTokenEndpointResponse();
+        if (
+          !oidcTokenEndpointResponse ||
+          !oidcTokenEndpointResponse.access_token
+        )
+          return null;
         // Set the token in the trpc client headers
         return await trpcClient.auth.getSelf.query();
       } catch (error: unknown) {

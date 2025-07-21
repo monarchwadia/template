@@ -3,6 +3,7 @@ import type {
   TokenEndpointResponse,
   AuthorizationCodeGrantChecks,
 } from "openid-client";
+import { AuthUtils } from "../utils/auth.utils";
 
 const serverUrl = import.meta.env.VITE_OIDC_SERVER_URL;
 if (!serverUrl) {
@@ -101,5 +102,5 @@ export const consumeCallback = async (): Promise<void> => {
   console.log("Received tokens from OIDC server:", tokens);
 
   // save the tokens in local storage
-  localStorage.setItem("oidc_token_endpoint_response", JSON.stringify(tokens));
+  AuthUtils.setOidcTokenEndpointResponse(tokens);
 };

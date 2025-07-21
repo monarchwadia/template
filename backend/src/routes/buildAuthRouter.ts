@@ -8,58 +8,6 @@ const prisma = new PrismaClient();
 
 export const buildAuthRouter = (deps: Dependencies) => {
   const authRouter = router({
-    register: publicProcedure
-      .input(
-        z
-          .object({
-            email: z.string().email(),
-            password: z.string().min(6),
-          })
-          .strict()
-      )
-      .mutation(async ({ input, ctx }) => {
-        if (ctx.userId) {
-          throw new Error("Already authenticated");
-        }
-        const { userService } = deps;
-        const user = await userService.createUser(input.email, input.password);
-        return { message: "Registration successful", user: user.email };
-      }),
-    login: publicProcedure
-      .input(
-        z.object({
-          email: z.string().email(),
-          password: z.string().min(6),
-        })
-      )
-      .output(
-        z.object({
-          success: z.literal(true),
-          token: z.string(),
-        })
-      )
-      .mutation(async ({ input, ctx }) => {
-        if (ctx.userId) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Already authenticated",
-          });
-        }
-        const { userService } = deps;
-        try {
-          const token = await userService.authenticateUser(
-            input.email,
-            input.password
-          );
-          return { success: true, token };
-        } catch (error) {
-          throw new TRPCError({
-            code: "UNAUTHORIZED",
-            message:
-              error instanceof Error ? error.message : "Invalid credentials",
-          });
-        }
-      }),
     getSelf: protectedProcedure.query(async ({ ctx }) => {
       const user = await prisma.user.findUnique({
         where: { id: ctx.userId },
@@ -113,7 +61,41 @@ export const buildAuthRouter = (deps: Dependencies) => {
      *
      *
      */
-    getOwnProfile: publicProcedure.query(async ({ ctx }) => {}),
+    ensureUserProfile: publicProcedure
+      .input(
+        z.object({
+          accessToken: z.string(),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        // This procedure is called after OIDC login to ensure the user profile exists in our DB.
+        // If the user profile does not exist, it should be created.
+        // No new session is created here, as the OIDC flow handles that.
+        if (ctx.userId) {
+          // Just return early if the user is already authenticated
+          return {
+            success: true,
+          };
+        }
+
+        const { userService } = deps;
+        try {
+          // Use the access token to fetch user info from OIDC provider
+          const userInfo = await userService.getUserInfoFromOidc(
+            input.accessToken
+          );
+          if (!userInfo) {
+            throw new TRPCError({
+              code: "UNAUTHORIZED",
+              message: "Invalid access token",
+            });
+          }
+
+          // Ensure the user profile exists in our DB
+          await userService.createUser(userInfo);
+          return { success: true };
+        }
+      }),
   });
   return authRouter;
 };
