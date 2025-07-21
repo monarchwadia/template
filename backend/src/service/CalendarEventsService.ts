@@ -36,7 +36,14 @@ export class CalendarEventsService {
       where: { communityId },
       include: { user: true },
     });
-    return members.map((member) => member.user.email);
+    const emails: string[] = [];
+    for (const member of members) {
+      // Filter out null/undefined emails
+      if (member.user.email) {
+        emails.push(member.user.email);
+      }
+    }
+    return emails;
   }
 
   async createCalendarEvent(

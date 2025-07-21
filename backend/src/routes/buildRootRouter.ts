@@ -5,6 +5,7 @@ import { buildCommunityRouter } from "./buildCommunityRouter";
 import { buildCalendarEventsRouter } from "./buildCalendarEventsRouter";
 
 import { buildFileManagementRouter } from "./fileManagementRouter";
+import { createTRPCClient } from "@trpc/client";
 
 export const buildRootRouter = (deps: Dependencies) => {
   const appRouter = router({
@@ -21,3 +22,4 @@ export const buildRootRouter = (deps: Dependencies) => {
 };
 
 export type AppRouter = ReturnType<typeof buildRootRouter>;
+export type TRPCClient = ReturnType<typeof createTRPCClient<AppRouter>>;

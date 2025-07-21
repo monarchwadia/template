@@ -40,7 +40,7 @@ async function getCommunityMembers(communityId: string) {
     where: { communityId },
     include: { user: true },
   });
-  return members.map((m) => m.user.email);
+  return members;
 }
 
 function formatEventList(events: any[]) {
@@ -74,8 +74,15 @@ async function sendWeeklyCommunityDigests() {
 
       body += `\n\nSee you there!`;
 
-      // Queue emails using EmailService (adds to outbox)
-      await emailService.sendGenericEmail(memberEmails, subject, body);
+      const existingEmails: string[] = [];
+      for (const member of memberEmails) {
+        // Filter out null/undefined emails
+        if (member.user.email) {
+          existingEmails.push(member.user.email);
+        }
+      }
+      await emailService.sendGenericEmail(existingEmails, subject, body);
+
       console.log(
         `[weeklyDigestJob] Queued digest for ${memberEmails.length} members of community ${community.name}`
       );
