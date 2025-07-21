@@ -11,14 +11,18 @@ const jwtService = new JwtService(appConfig.jwtSecret);
 const userService = new UserService(prisma, jwtService);
 
 export async function createContext({ req }: CreateHTTPContextOptions) {
-  let userId: string | null = null;
   const auth = req.headers["authorization"];
   if (auth && auth.startsWith("Bearer ")) {
     const token = auth.slice(7);
     // Use UserService to get the user ID from the access token
-    userId = await userService.getUserInfoFromAccessToken(token);
+    const user = await userService.getDbUserFromAccessToken(token);
+    return {
+      userId: user?.id,
+    };
   }
-  return { userId };
+  return {
+    userId: null,
+  };
 }
 
 export type Context = Awaited<ReturnType<typeof createContext>>;

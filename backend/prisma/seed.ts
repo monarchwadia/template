@@ -1,6 +1,4 @@
 import { provideDependencies } from "../src/provideDependencies";
-import { UserService } from "../src/service/UserService";
-import { PrismaClient, User } from "./generated/prisma";
 
 async function main() {
   const deps = provideDependencies();
@@ -14,11 +12,11 @@ async function main() {
     await prisma.user.deleteMany();
 
     // Create a dummy user
-    const ownerUser = await userService.createUser(
-      "owner@owner.com",
-      "password"
-    );
-    const userUser = await userService.createUser("user@user.com", "password");
+    const fakeOwnerUser = await userService.createUser({
+      email: "fake@fake.com",
+      name: "Fake User",
+      oidcSub: "fake-sub-owner",
+    });
 
     // Add dummy communities using the CommunityService
     const communitySeeds = [
@@ -55,7 +53,7 @@ async function main() {
     for (const community of communitySeeds) {
       const created = await communityService.createCommunity(
         community,
-        ownerUser.id
+        fakeOwnerUser.id
       );
       createdCommunities.push(created);
     }
@@ -69,7 +67,7 @@ async function main() {
         description:
           " We are a small sitting group in Toronto Canada associated with the Sanbo Zen lineage of practice. Students in the group have worked with a combination of teachers; Elaine MacInnes, Nenates Albert, Roselyn Stone, Dragan Petrovic, Brian Chisholm, Patrick Gallagher and Valerie Forstman. We are a private zendo, but inquiries can be made by email to torontozendowest@gmail.com.",
       },
-      ownerUser.id
+      fakeOwnerUser.id
     );
 
     // 1 Tuesday sit (next Tuesday from now)
@@ -98,11 +96,11 @@ async function main() {
           endDt: sitEnd,
           communityId: torontoZendo.id,
         },
-        ownerUser.id
+        fakeOwnerUser.id
       );
       await calendarEventsService.publishCalendarEvent(
         zazenEvent.id,
-        ownerUser.id
+        fakeOwnerUser.id
       );
     }
 
@@ -118,11 +116,11 @@ async function main() {
         endDt: sesshinEnd,
         communityId: torontoZendo.id,
       },
-      ownerUser.id
+      fakeOwnerUser.id
     );
     await calendarEventsService.publishCalendarEvent(
       sesshinEvent.id,
-      ownerUser.id
+      fakeOwnerUser.id
     );
 
     // Add dummy calendar events for each community
@@ -139,7 +137,7 @@ async function main() {
           ), // +2 hours
           communityId: community.id,
         },
-        ownerUser.id
+        fakeOwnerUser.id
       );
 
       // Event 2: Another future event
@@ -154,7 +152,7 @@ async function main() {
           ), // +3 hours
           communityId: community.id,
         },
-        ownerUser.id
+        fakeOwnerUser.id
       );
     }
   } finally {

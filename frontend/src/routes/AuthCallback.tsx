@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { consumeCallback } from "../oidc/Oidc";
+import { trpcClient } from "../clients/trpcClient";
 
 export const AuthCallbackPage = () => {
   const callbackConsumed = useRef(false);
@@ -10,9 +11,16 @@ export const AuthCallbackPage = () => {
     }
     callbackConsumed.current = true;
     consumeCallback()
-      .then(() => {
+      .then((token) => {
         // Handle successful authentication, e.g., redirect to home or profile
-        window.location.href = "/";
+        trpcClient.auth.ensureUserProfile
+          .mutate({
+            accessToken: token.access_token,
+          })
+          .then(() => {
+            console.log("User profile ensured successfully.");
+            window.location.href = "/";
+          });
       })
       .catch((error) => {
         console.error("Authentication callback error:", error);

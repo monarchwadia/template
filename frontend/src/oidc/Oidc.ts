@@ -74,7 +74,7 @@ export const beginLogin = async () => {
   window.location.href = redirectTo.href;
 };
 
-export const consumeCallback = async (): Promise<void> => {
+export const consumeCallback = async (): Promise<TokenEndpointResponse> => {
   const config = await retrieveConfig();
   const code_verifier = localStorage.getItem("oidc_code_verifier");
   localStorage.removeItem("oidc_code_verifier");
@@ -103,4 +103,6 @@ export const consumeCallback = async (): Promise<void> => {
 
   // save the tokens in local storage
   AuthUtils.setOidcTokenEndpointResponse(tokens);
+
+  return tokens;
 };

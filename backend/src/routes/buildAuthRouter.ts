@@ -67,7 +67,7 @@ export const buildAuthRouter = (deps: Dependencies) => {
           accessToken: z.string(),
         })
       )
-      .query(async ({ ctx, input }) => {
+      .mutation(async ({ ctx, input }) => {
         // This procedure is called after OIDC login to ensure the user profile exists in our DB.
         // If the user profile does not exist, it should be created.
         // No new session is created here, as the OIDC flow handles that.
@@ -79,22 +79,37 @@ export const buildAuthRouter = (deps: Dependencies) => {
         }
 
         const { userService } = deps;
-        try {
-          // Use the access token to fetch user info from OIDC provider
-          const userInfo = await userService.getUserInfoFromOidc(
-            input.accessToken
-          );
-          if (!userInfo) {
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Invalid access token",
-            });
-          }
+        // Use the access token to fetch user info from OIDC provider
 
-          // Ensure the user profile exists in our DB
-          await userService.createUser(userInfo);
-          return { success: true };
+        const dbUser = await userService.getDbUserFromAccessToken(
+          input.accessToken
+        );
+        if (dbUser) {
+          // If the user already exists in our DB, just return success
+          return {
+            success: true,
+          };
         }
+
+        // If the user does not exist, create a new user profile that keys to the OIDC sub
+
+        const userInfo = await userService.getUserInfoFromOidc(
+          input.accessToken
+        );
+        if (!userInfo) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Invalid access token",
+          });
+        }
+        await userService.createUser({
+          oidcSub: userInfo.sub,
+          email: userInfo.email || undefined,
+          name: userInfo.name || undefined,
+        });
+
+        // Ensure the user profile exists in our DB
+        return { success: true };
       }),
   });
   return authRouter;

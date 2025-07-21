@@ -1,8 +1,10 @@
 import bcrypt from "bcrypt";
-import { PrismaClient } from "../../prisma/generated/prisma";
+import { PrismaClient, User } from "../../prisma/generated/prisma";
 import { JwtService } from "./JwtService";
 import * as client from "openid-client";
 import { getAppConfig } from "../utils/getAppConfig";
+import { TRPCError } from "@trpc/server";
+import { userInfo } from "os";
 
 const appConfig = getAppConfig();
 
@@ -48,9 +50,9 @@ export class UserService {
     return config;
   }
 
-  async getUserInfoFromAccessToken(
+  async getUserInfoFromOidc(
     accessToken: string
-  ): Promise<string | null> {
+  ): Promise<client.UserInfoResponse | null> {
     try {
       const config = await this.getOidcConfig();
 
@@ -69,15 +71,13 @@ export class UserService {
       }
 
       // Fetch user info using the access token
-      // Note: We use client.skipSubjectCheck since we don't have the expected subject
       const userinfo = await client.fetchUserInfo(
         config,
         accessToken,
         client.skipSubjectCheck
       );
 
-      // userinfo.sub is the user's unique identifier
-      return userinfo.sub;
+      return userinfo;
     } catch (e) {
       // Invalid token, return null
       if (process.env.NODE_ENV === "development") {
@@ -96,6 +96,58 @@ export class UserService {
         }
       }
       return null;
+    }
+  }
+
+  async getDbUserFromAccessToken(accessToken: string): Promise<User | null> {
+    const userinfo = await this.getUserInfoFromOidc(accessToken);
+    if (!userinfo || !userinfo.sub) {
+      return null;
+    }
+    const dbUser = await this.prisma.user.findUnique({
+      where: { oidcSub: userinfo.sub },
+    });
+    return dbUser;
+  }
+
+  async ensureUserProfileExists(accessToken: string): Promise<void> {
+    // Reuse the existing method to get userinfo
+    const userinfo = await this.getUserInfoFromOidc(accessToken);
+
+    if (!userinfo) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Invalid access token",
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await this.prisma.user.findUnique({
+      where: { oidcSub: userinfo.sub },
+    });
+
+    if (existingUser) {
+      // User already exists, no-op
+      if (process.env.NODE_ENV === "development") {
+        console.log(`User with oidcSub ${userinfo.sub} already exists`);
+      }
+      return;
+    }
+
+    // Create new user from userinfo
+    const newUser = await this.createUser({
+      oidcSub: userinfo.sub,
+      email: userinfo.email || undefined,
+      name: userinfo.name || undefined,
+    });
+
+    if (process.env.NODE_ENV === "development") {
+      console.log(`Created new user:`, {
+        id: newUser.id,
+        oidcSub: newUser.oidcSub,
+        email: newUser.email,
+        name: newUser.name,
+      });
     }
   }
 
