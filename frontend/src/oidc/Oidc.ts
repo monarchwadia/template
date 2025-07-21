@@ -46,7 +46,8 @@ export const beginLogin = async () => {
   const code_challenge: string =
     await client.calculatePKCECodeChallenge(code_verifier);
   const parameters: Record<string, string> = {
-    redirectUrl,
+    redirect_uri: redirectUrl,
+    scope: "openid profile email",
     code_challenge,
     code_challenge_method: "S256",
   };

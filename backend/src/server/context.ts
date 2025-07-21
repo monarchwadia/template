@@ -34,6 +34,17 @@ export async function createContext({ req }: CreateHTTPContextOptions) {
     try {
       const config = await retrieveConfig();
 
+      // Debug: Check if userinfo endpoint is available
+      if (process.env.NODE_ENV === "development") {
+        const serverMetadata = config.serverMetadata();
+        console.log(
+          "OIDC Server userinfo_endpoint:",
+          serverMetadata.userinfo_endpoint
+        );
+        console.log("OIDC Server issuer:", serverMetadata.issuer);
+        console.log("Token (first 20 chars):", token.substring(0, 20) + "...");
+      }
+
       // Fetch user info using the access token
       // Note: We use client.skipSubjectCheck since we don't have the expected subject
       const userinfo = await client.fetchUserInfo(
@@ -48,6 +59,18 @@ export async function createContext({ req }: CreateHTTPContextOptions) {
       // Invalid token, userId remains null
       if (process.env.NODE_ENV === "development") {
         console.error("OIDC token verification failed:", e);
+        // Log more details about the error for debugging
+        if (e instanceof Error) {
+          console.error("Error name:", e.name);
+          console.error("Error message:", e.message);
+          // Check if it's a WWW-Authenticate challenge error
+          if ("code" in e) {
+            console.error("Error code:", (e as any).code);
+          }
+          if ("cause" in e && e.cause) {
+            console.error("Error cause:", e.cause);
+          }
+        }
       }
     }
   }
