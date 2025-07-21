@@ -1,4 +1,8 @@
 import * as client from "openid-client";
+import type {
+  TokenEndpointResponse,
+  AuthorizationCodeGrantChecks,
+} from "openid-client";
 
 const serverUrl = import.meta.env.VITE_OIDC_SERVER_URL;
 if (!serverUrl) {
@@ -13,8 +17,7 @@ if (!clientId) {
   );
 }
 
-export const beginLogin = async () => {
-  const redirectUrl = `${window.location.origin}/auth/callback`;
+const retrieveConfig = async () => {
   let config: client.Configuration;
   if (import.meta.env.DEV) {
     // Allow insecure requests to HTTP in development mode
@@ -30,7 +33,16 @@ export const beginLogin = async () => {
   } else {
     config = await client.discovery(new URL(serverUrl), clientId);
   }
+  return config;
+};
+
+const buildRedirectUri = () => `${window.location.origin}/auth/callback`;
+
+export const beginLogin = async () => {
+  const config = await retrieveConfig();
+  const redirectUrl = buildRedirectUri();
   const code_verifier: string = client.randomPKCECodeVerifier();
+  localStorage.setItem("oidc_code_verifier", code_verifier);
   const code_challenge: string =
     await client.calculatePKCECodeChallenge(code_verifier);
   const parameters: Record<string, string> = {
@@ -47,10 +59,46 @@ export const beginLogin = async () => {
      * for every redirect to the authorization_endpoint.
      */
     parameters.state = client.randomState();
+    localStorage.setItem("oidc_state", parameters.state);
+  } else {
+    // If the server supports PKCE, we can skip the state parameter
+    // clear any previous state to avoid checking with it later
+    localStorage.removeItem("oidc_state");
   }
 
   const redirectTo = client.buildAuthorizationUrl(config, parameters);
 
   console.log("Redirecting to OIDC server:", redirectTo);
   window.location.href = redirectTo.href;
+};
+
+export const consumeCallback = async (): Promise<void> => {
+  const config = await retrieveConfig();
+  const code_verifier = localStorage.getItem("oidc_code_verifier");
+  localStorage.removeItem("oidc_code_verifier");
+  if (!code_verifier) {
+    throw new Error("No code verifier found in local storage");
+  }
+
+  const state = localStorage.getItem("oidc_state");
+  localStorage.removeItem("oidc_state");
+
+  // Prepare the checks for the authorization code grant
+  const checks: AuthorizationCodeGrantChecks = {
+    pkceCodeVerifier: code_verifier,
+  };
+  if (state) {
+    checks.expectedState = state;
+  }
+
+  const tokens: TokenEndpointResponse = await client.authorizationCodeGrant(
+    config,
+    new URL(window.location.href),
+    checks
+  );
+
+  console.log("Received tokens from OIDC server:", tokens);
+
+  // save the tokens in local storage
+  localStorage.setItem("oidc_token_endpoint_response", JSON.stringify(tokens));
 };

@@ -9,6 +9,7 @@ import CommunityList from "./CommunityList";
 import CommunityView from "./CommunityView";
 import CreateEvent from "./CreateEvent";
 import EventView from "./EventView";
+import { AuthCallbackPage } from "./AuthCallback";
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +24,7 @@ export const router = createBrowserRouter([
       { path: "c/:slug", element: <CommunityView /> }, // View a single community at /c/:slug
       { path: "c/:slug/create-event", element: <CreateEvent /> }, // Create event route
       { path: "c/:slug/events/:eventId", element: <EventView /> }, // View a single event
+      { path: "auth/callback", element: <AuthCallbackPage /> }, // Placeholder for auth callback
       { path: "", element: <App /> }, // Home page
     ],
   },
