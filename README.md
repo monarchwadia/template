@@ -82,7 +82,14 @@ aws configure
 ## Step 2 - Create bucket
 
 ```bash
+# From host machine
 aws --endpoint-url=http://localhost:4566 \
+    s3api create-bucket \
+    --bucket coolproject-localstack \
+    --region us-east-1
+
+# From another docker container (like a devcontainer)
+aws --endpoint-url=http://host.docker.internal:4566 \
     s3api create-bucket \
     --bucket coolproject-localstack \
     --region us-east-1
@@ -93,8 +100,16 @@ aws --endpoint-url=http://localhost:4566 \
 There is a file called `localstack/cors.json` that will let you set the cors configuration for the bucket.
 
 ```bash
-# From the project rootdir
+# Run this from the project rootdir
+
+# From host machine
 aws --endpoint-url=http://localhost:4566 \
+  s3api put-bucket-cors \
+  --bucket coolproject-localstack \
+  --cors-configuration file://localstack/cors.json
+
+# From another docker container (like a devcontainer)
+aws --endpoint-url=http://host.docker.internal:4566 \
   s3api put-bucket-cors \
   --bucket coolproject-localstack \
   --cors-configuration file://localstack/cors.json
@@ -153,6 +168,8 @@ lastname:         user
 email verified:   true
 ```
 
+For each, also go to the "User -> Credentials" tab and set a new password (`admin` for admin user, `user` for user user), with 'temporary' set to false
+
 For each, also go to the "User -> Credentials" tab and set a new password, with 'temporary' set to false
 
 (At this point, if you would like, check that you can log in at `http://localhost:6789/realms/coolproject/account` with the users.)
@@ -168,6 +185,15 @@ Then, still in the main admin console...
 - click save
 
 Now you should be able to click the 'login' button to get redirected
+
+## Prisma
+
+From the backend folder, type
+
+```bash
+pnpm prisma migrate reset
+pnpm seed
+```
 
 # Deployment
 
