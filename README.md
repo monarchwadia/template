@@ -129,12 +129,18 @@ Takes about 30 seconds for it to be available on localhost:6789
 docker run -d -p 127.0.0.1:6789:8080 \
   -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
   -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+  -e KC_HOSTNAME=localhost \
+  -e KC_HOSTNAME_PORT=6789 \
+  -e KC_HOSTNAME_STRICT=false \
+  -e KC_HOSTNAME_STRICT_HTTPS=false \
   --user 0 \
   --name coolproject-keycloak \
   -v coolproject-keycloak:/opt/keycloak/data/h2 \
   quay.io/keycloak/keycloak:26.3.1 \
   start-dev
 ```
+
+> ⚠️⚠️PRODUCTION NOTE: The `KC_HOSTNAME`, `KC_HOSTNAME_PORT`, `KC_HOSTNAME_STRICT`, and `KC_HOSTNAME_STRICT_HTTPS` variables are tuned here for localhost. You'll have to modify them in prod when deploying KC to prod.
 
 After 30s, visit http://localhost:6789 and log in with `admin/admin` (configured in the bash command above)
 
